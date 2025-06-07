@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Tecktrek</string>
+    <string name="result_button">Download Photo</string>
+    <string name="main_image_title">Add your photo</string>
+    <string name="main_button">Generate AI</string>
+    <string name="main_edittext_hint">Enter your prompt...</string>
+    <string name="main_style_title">Choose your Style</string>
+</resources>
