@@ -38,3 +38,6 @@ data class Config(
 data class StyleResponse(
     @SerializedName("items") val items: List<StyleItem>
 )
+data class BaseResponse<T>(
+    @SerializedName("data") val data: T
+)

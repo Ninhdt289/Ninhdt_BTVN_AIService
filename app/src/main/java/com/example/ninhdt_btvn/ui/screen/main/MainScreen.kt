@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ninhdt_btvn.R
+import com.example.ninhdt_btvn.data.remote.model.BaseResponse
 import com.example.ninhdt_btvn.data.remote.model.StyleResponse
 import com.example.ninhdt_btvn.data.remote.repository.StyleRepository
 
@@ -32,11 +34,11 @@ import com.example.ninhdt_btvn.data.remote.repository.StyleRepository
 fun MainScreen(modifier: Modifier = Modifier) {
     var promptText by remember { mutableStateOf("") }
     val repository = StyleRepository()
-    var stylesResult by remember { mutableStateOf<Result<StyleResponse>?>(null) }
+    var stylesResult by remember { mutableStateOf<Result<BaseResponse<StyleResponse>>?>(null) }
 
     LaunchedEffect(Unit) {
         stylesResult = repository.getStyles()
-        promptText = "Fetched styles: ${stylesResult?.getOrNull()?.items}"
+        Log.d("MainScreenaaaa", "Fetched styles: ${stylesResult?.getOrNull()?.data?.items}")
     }
     Column(
         modifier = modifier
