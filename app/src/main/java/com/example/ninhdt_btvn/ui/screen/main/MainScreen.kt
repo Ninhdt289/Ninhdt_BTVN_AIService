@@ -1,6 +1,5 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,21 +24,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
-import com.example.ninhdt_btvn.data.remote.model.BaseResponse
-import com.example.ninhdt_btvn.data.remote.model.StyleResponse
-import com.example.ninhdt_btvn.data.remote.repository.StyleRepository
+import com.example.ninhdt_btvn.data.remote.model.StyleCategory
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
-    var promptText by remember { mutableStateOf("") }
-    val repository = StyleRepository()
-    var stylesResult by remember { mutableStateOf<Result<BaseResponse<StyleResponse>>?>(null) }
+fun MainScreen(modifier: Modifier = Modifier,
+               viewModel: MainViewModel = koinViewModel(),
+) {
+    val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        stylesResult = repository.getStyles()
-        Log.d("MainScreenaaaa", "Fetched styles: ${stylesResult?.getOrNull()?.data?.items}")
-    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -47,17 +42,28 @@ fun MainScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         PromptInputField(
-            value = promptText,
-            onValueChange = { promptText = it },
-            onClearClick = { promptText = "" }
+            value = state.promptText,
+            onValueChange = { viewModel.onEvent(MainUIEvent.UpdatePromptText(it)) },
+            onClearClick = { viewModel.onEvent(MainUIEvent.UpdatePromptText("")) }
         )
 
         PhotoUploadArea(onChangeImage = {})
-        StyleSelectionSection()
+
+        when {
+            state.isGenerating -> Text("Loading styles...")
+
+            state.errorMessage != null -> Text("Error: ${state.errorMessage}")
+
+            !state.availableStyles.isNullOrEmpty() -> {
+                StyleSelectionSection(state.availableStyles)
+            }
+        }
+
+
+
         Spacer(modifier = Modifier.weight(1f))
         GenerateButton()
         Spacer(modifier = Modifier.height(50.dp))
-
     }
 }
 
@@ -172,7 +178,7 @@ fun PhotoUploadArea(
 }
 
 @Composable
-fun StyleSelectionSection() {
+fun StyleSelectionSection( styleList: List<StyleCategory>?) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -183,29 +189,40 @@ fun StyleSelectionSection() {
             fontWeight = FontWeight.SemiBold
         )
 
-        StyleList()
+        StyleList(styleList)
     }
 }
 
 @Composable
-fun StyleList() {
-    val styleItems = listOf(
-        StyleItem("Novelistic", "style_1"),
-        StyleItem("Novelistic", "style_2"),
-        StyleItem("Novelistic", "style_3"),
-        StyleItem("Novelistic", "style_4"),
-        StyleItem("Realistic", "style_5")
-    )
-
+fun StyleList(styleList: List<StyleCategory>?) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(styleItems) { item ->
-            StyleItemCard(styleItem = item)
+        if (styleList != null) {
+            items(styleList[0].styles.map { styleCategory ->
+                StyleItem(
+                    name = styleCategory.name,
+                    imageResource = styleCategory.key
+                )
+            } ?: emptyList()) { item ->
+                StyleItemCard(styleItem = item)
+            }
         }
+
+
     }
 }
-
+@Composable
+fun UrlImageWithCoil(url: String) {
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(100.dp)
+            .clip(RoundedCornerShape(8.dp))
+    )
+}
 @Composable
 fun StyleItemCard(styleItem: StyleItem) {
     Column(
@@ -218,15 +235,9 @@ fun StyleItemCard(styleItem: StyleItem) {
                 .clip(RoundedCornerShape(8.dp))
                 .clickable { /* Handle style selection */ }
         ) {
-            // Placeholder for style image - replace with actual image resource
-            // Image(
-            //     painter = painterResource(id = R.drawable.${styleItem.imageResource}),
-            //     contentDescription = styleItem.name,
-            //     modifier = Modifier.fillMaxSize(),
-            //     contentScale = ContentScale.Crop
-            // )
 
-            // Temporary placeholder background
+            UrlImageWithCoil(styleItem.imageResource)
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()

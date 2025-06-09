@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "https://style-management-api.dev.apero.vn/"
+    private const val BASE_URL = "https://api-style-manager.apero.vn/"
 
     private val retrofit by lazy { buildRetrofit() }
 

@@ -8,9 +8,16 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
 composeBom = "2024.04.01"
+koinBom = "4.0.2"
+startupRuntime = "1.2.0"
 navigationCompose = "2.8.5"
 
 [libraries]
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose" }
+koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
