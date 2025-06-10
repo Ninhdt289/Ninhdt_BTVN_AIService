@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DeviceImageGallery(
     images: List<DeviceImage>,
-    selectedImages: Set<Long>,
+    selectedImageId: Long?,
     onToggleImage: (Long) -> Unit,
     isLoading: Boolean,
     modifier: Modifier = Modifier
@@ -44,7 +44,7 @@ fun DeviceImageGallery(
                     items(images) { image ->
                         DeviceImageItem(
                             image = image,
-                            isSelected = selectedImages.contains(image.id),
+                            isSelected = image.id == selectedImageId,
                             onToggle = { onToggleImage(image.id) }
                         )
                     }

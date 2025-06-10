@@ -48,9 +48,11 @@ fun PickPhotoScreen() {
     }
 
     val handleNext = {
-        val selectedImageIds = uiState.selectedImages
-        val selectedImages = uiState.images.filter { selectedImageIds.contains(it.id) }
-        println("Selected ${selectedImages.size} images")
+        val selectedImageId = uiState.selectedImageId
+        val selectedImage = uiState.images.find { it.id == selectedImageId }
+        selectedImage?.let {
+            println("Selected image: ${it.id}")
+        }
     }
 
     Scaffold(
@@ -85,7 +87,7 @@ fun PickPhotoScreen() {
         } else {
             DeviceImageGallery(
                 images = uiState.images,
-                selectedImages = uiState.selectedImages,
+                selectedImageId = uiState.selectedImageId,
                 onToggleImage = viewModel::toggleImageSelection,
                 isLoading = uiState.isLoading,
                 modifier = Modifier
