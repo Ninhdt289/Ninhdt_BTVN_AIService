@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.ninhdt_btvn.ui.navigation.ScreenNavigation
 import com.example.ninhdt_btvn.ui.screen.main.MainScreen
 import com.example.ninhdt_btvn.ui.theme.NinhdtBTVNAIServicePublicTheme
 
@@ -20,8 +21,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             NinhdtBTVNAIServicePublicTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(modifier = Modifier.padding(innerPadding))
+                    ScreenNavigation(modifier = Modifier.padding(innerPadding))
                 }
+
             }
         }
     }
