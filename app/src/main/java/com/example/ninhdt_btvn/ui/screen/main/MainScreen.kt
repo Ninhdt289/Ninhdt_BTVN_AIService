@@ -28,12 +28,28 @@ import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
+import androidx.navigation.NavController
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.example.ninhdt_btvn.utils.PermissionUtils
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier,
-               viewModel: MainViewModel = koinViewModel(),
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = koinViewModel(),
+    onGenerate: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+
+    val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
+        onPermissionGranted = onGenerate,
+        onPermissionDenied = {  }
+    )
 
     Column(
         modifier = modifier
@@ -59,10 +75,17 @@ fun MainScreen(modifier: Modifier = Modifier,
             }
         }
 
-
-
         Spacer(modifier = Modifier.weight(1f))
-        GenerateButton()
+        GenerateButton(
+            onClick = {
+                viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+                if (PermissionUtils.hasImagePermissions(context)) {
+                    onGenerate()
+                } else {
+                    permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
+                }
+            }
+        )
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
@@ -254,9 +277,11 @@ fun StyleItemCard(styleItem: StyleItem) {
 }
 
 @Composable
-fun GenerateButton() {
+fun GenerateButton(
+    onClick: () -> Unit
+) {
     Button(
-        onClick = {  },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)

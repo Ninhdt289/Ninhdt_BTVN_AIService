@@ -11,7 +11,7 @@ fun NavController.navigateToResult(navOptions: NavOptions) = navigate(route = Re
 
 fun NavGraphBuilder.resultScreen(
 ) {
-    composable<ResultRoute> {
+    composable(route = ResultRoute.route) {
         ResultScreen()
     }
 }

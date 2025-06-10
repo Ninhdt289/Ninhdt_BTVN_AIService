@@ -18,9 +18,12 @@ fun ScreenNavigation(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = AiGenScreen.PickPhotoScreen.route
+        startDestination = AiGenScreen.MainScreen.route
     ) {
-        mainScreen()
+        mainScreen(
+            onGenerate = {navController.navigate(AiGenScreen.PickPhotoScreen.route)}
+
+        )
 
         pickPhotoScreen()
 
