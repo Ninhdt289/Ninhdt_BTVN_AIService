@@ -5,6 +5,6 @@ import com.example.ninhdt_btvn.data.remote.model.StyleResponse
 import retrofit2.http.GET
 
 interface StyleAPI {
-    @GET("v2/styles?page=1&limit=100&project=Artimind")
+    @GET("category?project=techtrek&segmentValue=IN&styleType=imageToImage&isApp=true")
     suspend fun getStyles(): BaseResponse<StyleResponse>
 }

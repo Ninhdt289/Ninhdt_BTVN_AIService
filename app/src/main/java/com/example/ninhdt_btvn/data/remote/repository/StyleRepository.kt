@@ -20,6 +20,6 @@ class StyleRepository {
         }
     }
     companion object {
-        private const val TAG = "StyleRepository"
+        private const val TAG = "StyleRepositoriiiii"
     }
 }
