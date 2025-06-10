@@ -29,14 +29,27 @@ import com.example.ninhdt_btvn.R
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.example.ninhdt_btvn.utils.PermissionUtils
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
-    onGenerate :() -> Unit = {},
+    onGenerate: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+
+    val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
+        onPermissionGranted = onGenerate,
+        onPermissionDenied = {  }
+    )
 
     Column(
         modifier = modifier
@@ -66,7 +79,11 @@ fun MainScreen(
         GenerateButton(
             onClick = {
                 viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
-                onGenerate()
+                if (PermissionUtils.hasImagePermissions(context)) {
+                    onGenerate()
+                } else {
+                    permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
+                }
             }
         )
         Spacer(modifier = Modifier.height(50.dp))
