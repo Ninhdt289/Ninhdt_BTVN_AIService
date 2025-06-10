@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.ninhdt_btvn.ui.screen.main.mainScreen
+import com.example.ninhdt_btvn.ui.screen.pickphoto.navigation.pickPhotoScreen
 import com.example.ninhdt_btvn.ui.screen.result.navigation.resultScreen
 
 @Composable
@@ -17,9 +18,11 @@ fun ScreenNavigation(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = AiGenScreen.MainScreen.route
+        startDestination = AiGenScreen.PickPhotoScreen.route
     ) {
         mainScreen()
+
+        pickPhotoScreen()
 
         resultScreen()
     }
