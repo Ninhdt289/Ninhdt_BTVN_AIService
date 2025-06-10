@@ -10,8 +10,12 @@ import com.example.ninhdt_btvn.ui.screen.pickphoto.PickPhotoScreen
 fun NavController.navigateToPickPhoto(navOptions: NavOptions) = navigate(route = PickPhotoRoute, navOptions)
 
 fun NavGraphBuilder.pickPhotoScreen(
+    onClose: () -> Unit,
 ) {
     composable(route = PickPhotoRoute.route) {
-        PickPhotoScreen()
+        PickPhotoScreen(
+            onClose = onClose ,
+            onNext = { }
+        )
     }
 }

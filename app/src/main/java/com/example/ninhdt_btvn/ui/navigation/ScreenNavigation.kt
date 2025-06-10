@@ -25,7 +25,9 @@ fun ScreenNavigation(
 
         )
 
-        pickPhotoScreen()
+        pickPhotoScreen(
+            onClose = {navController.popBackStack()}
+        )
 
         resultScreen()
     }
