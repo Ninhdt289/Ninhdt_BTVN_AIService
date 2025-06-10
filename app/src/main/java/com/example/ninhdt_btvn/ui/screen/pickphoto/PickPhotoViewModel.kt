@@ -34,13 +34,10 @@ class PickPhotoViewModel(
     }
 
     fun toggleImageSelection(imageId: Long) {
-        val currentSelected = _uiState.value.selectedImages
-        val newSelected = if (currentSelected.contains(imageId)) {
-            currentSelected - imageId
-        } else {
-            currentSelected + imageId
-        }
-        _uiState.value = _uiState.value.copy(selectedImages = newSelected)
+        val currentSelected = _uiState.value.selectedImageId
+        _uiState.value = _uiState.value.copy(
+            selectedImageId = if (currentSelected == imageId) null else imageId
+        )
     }
 
     fun setPermissionGranted(granted: Boolean) {
@@ -51,6 +48,6 @@ class PickPhotoViewModel(
     }
 
     fun clearSelection() {
-        _uiState.value = _uiState.value.copy(selectedImages = emptySet())
+        _uiState.value = _uiState.value.copy(selectedImageId = null)
     }
 }
