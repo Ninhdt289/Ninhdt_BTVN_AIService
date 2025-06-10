@@ -90,6 +90,7 @@ fun PickPhotoScreen() {
                 isLoading = uiState.isLoading,
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
             )
         }
     }

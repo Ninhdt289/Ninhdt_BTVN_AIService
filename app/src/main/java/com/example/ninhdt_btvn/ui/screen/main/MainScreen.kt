@@ -28,10 +28,13 @@ import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
+import androidx.navigation.NavController
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier,
-               viewModel: MainViewModel = koinViewModel(),
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = koinViewModel(),
+    onGenerate :() -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -59,10 +62,13 @@ fun MainScreen(modifier: Modifier = Modifier,
             }
         }
 
-
-
         Spacer(modifier = Modifier.weight(1f))
-        GenerateButton()
+        GenerateButton(
+            onClick = {
+                viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+                onGenerate()
+            }
+        )
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
@@ -254,9 +260,11 @@ fun StyleItemCard(styleItem: StyleItem) {
 }
 
 @Composable
-fun GenerateButton() {
+fun GenerateButton(
+    onClick: () -> Unit
+) {
     Button(
-        onClick = {  },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)

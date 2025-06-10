@@ -28,4 +28,5 @@ sealed class MainUIEvent {
     object ClearError : MainUIEvent()
     object ToggleStyleSelector : MainUIEvent()
     object ClearGeneratedImage : MainUIEvent()
+    object NavigateToPickPhoto : MainUIEvent()
 }

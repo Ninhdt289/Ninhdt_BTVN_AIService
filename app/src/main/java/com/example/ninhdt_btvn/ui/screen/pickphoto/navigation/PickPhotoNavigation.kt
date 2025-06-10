@@ -11,7 +11,7 @@ fun NavController.navigateToPickPhoto(navOptions: NavOptions) = navigate(route =
 
 fun NavGraphBuilder.pickPhotoScreen(
 ) {
-    composable<PickPhotoRoute> {
+    composable(route = PickPhotoRoute.route) {
         PickPhotoScreen()
     }
 }

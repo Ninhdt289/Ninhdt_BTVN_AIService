@@ -10,8 +10,9 @@ import com.example.ninhdt_btvn.ui.navigation.MainRoute
 fun NavController.navigateToMain(navOptions: NavOptions) = navigate(route = MainRoute, navOptions)
 
 fun NavGraphBuilder.mainScreen(
+    onGenerate: () -> Unit = {},
 ) {
-    composable<MainRoute> {
-        MainScreen()
+    composable(route = MainRoute.route) {
+        MainScreen(onGenerate = onGenerate)
     }
 }

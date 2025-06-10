@@ -53,6 +53,9 @@ class MainViewModel : ViewModel() {
             MainUIEvent.ClearError -> {
                 _uiState.update { it.copy(errorMessage = null) }
             }
+            MainUIEvent.NavigateToPickPhoto -> {
+                // Navigation will be handled by the UI layer
+            }
             // Thêm các xử lý khác nếu cần
             else -> {}
         }

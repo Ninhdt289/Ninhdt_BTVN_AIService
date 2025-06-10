@@ -1,21 +1,21 @@
 package com.example.ninhdt_btvn.ui.navigation
 
-import kotlinx.serialization.Serializable
-import kotlin.reflect.KClass
-
-
-sealed class AiGenScreen (val route: KClass<*>) {
-    data object MainScreen: AiGenScreen(MainRoute::class)
-    data object PickPhotoScreen: AiGenScreen(PickPhotoRoute::class)
-    data object ResultScreen : AiGenScreen(ResultRoute::class)
+sealed class AiGenScreen(val route: String) {
+    data object MainScreen : AiGenScreen(MainRoute.route)
+    data object PickPhotoScreen : AiGenScreen(PickPhotoRoute.route)
+    data object ResultScreen : AiGenScreen(ResultRoute.route)
 }
 
-@Serializable
-data object MainRoute
+object MainRoute {
+    const val route = "main"
+}
 
-@Serializable
-data object PickPhotoRoute
+object PickPhotoRoute {
+    const val route = "pick_photo"
+}
 
-@Serializable
-data object ResultRoute
+object ResultRoute {
+    const val route = "result"
+}
+
 
