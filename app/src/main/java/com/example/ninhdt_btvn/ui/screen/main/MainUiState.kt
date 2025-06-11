@@ -19,7 +19,9 @@ data class MainUIState(
 
     val errorMessage: String? = null,
 
-    val showStyleSelector: Boolean = false
+    val showStyleSelector: Boolean = false,
+
+    val selectedImageId: Long? = null
 )
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
@@ -29,4 +31,5 @@ sealed class MainUIEvent {
     object ToggleStyleSelector : MainUIEvent()
     object ClearGeneratedImage : MainUIEvent()
     object NavigateToPickPhoto : MainUIEvent()
+    data class SetSelectedImage(val imageId: Long) : MainUIEvent()
 }

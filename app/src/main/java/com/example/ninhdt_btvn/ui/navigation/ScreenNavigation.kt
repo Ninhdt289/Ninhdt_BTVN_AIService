@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -21,12 +22,15 @@ fun ScreenNavigation(
         startDestination = AiGenScreen.MainScreen.route
     ) {
         mainScreen(
-            onGenerate = {navController.navigate(AiGenScreen.PickPhotoScreen.route)}
+            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
 
         )
 
         pickPhotoScreen(
-            onClose = {navController.popBackStack()}
+            onClose = { navController.popBackStack() },
+            onImageSelected = {
+                navController.navigate(AiGenScreen.MainScreen.route)
+            }
         )
 
         resultScreen()

@@ -22,7 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun PickPhotoScreen(
     onClose: () -> Unit = {},
-    onNext: () -> Unit = {}
+    onNext: () -> Unit = {},
+    onImageSelected: (Long) -> Unit = {}
 ) {
     val context = LocalContext.current
     val imageRepository = remember { ImageRepository(context.contentResolver) }
@@ -46,19 +47,12 @@ fun PickPhotoScreen(
         }
     }
 
-
-    val handleNext = {
-        val selectedImageId = uiState.selectedImageId
-        val selectedImage = uiState.images.find { it.id == selectedImageId }
-        selectedImage?.let {
-            println("Selected image: ${it.id}")
-        }
-    }
-
     Scaffold(
         topBar = {
-            TopBar(
-                onClose = onClose,
+            TopBar(onClose = onClose, onNext = { onImageSelected(uiState.selectedImageId?: 0L)
+            Log.d("TAG", "TopBar: ${uiState.selectedImageId}")
+            },
+            nextEnabled = uiState.selectedImageId != null
             )
         },
         containerColor = Color.White

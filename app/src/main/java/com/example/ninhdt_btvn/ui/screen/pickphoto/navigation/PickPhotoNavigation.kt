@@ -11,11 +11,13 @@ fun NavController.navigateToPickPhoto(navOptions: NavOptions) = navigate(route =
 
 fun NavGraphBuilder.pickPhotoScreen(
     onClose: () -> Unit,
+    onImageSelected: (Long) -> Unit
 ) {
     composable(route = PickPhotoRoute.route) {
         PickPhotoScreen(
-            onClose = onClose ,
-            onNext = { }
+            onClose = onClose,
+            onNext = { },
+            onImageSelected = onImageSelected
         )
     }
 }

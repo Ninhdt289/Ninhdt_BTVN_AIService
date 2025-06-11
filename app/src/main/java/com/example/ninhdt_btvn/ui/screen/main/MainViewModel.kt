@@ -54,9 +54,10 @@ class MainViewModel : ViewModel() {
                 _uiState.update { it.copy(errorMessage = null) }
             }
             MainUIEvent.NavigateToPickPhoto -> {
-                // Navigation will be handled by the UI layer
             }
-            // Thêm các xử lý khác nếu cần
+            is MainUIEvent.SetSelectedImage -> {
+                _uiState.update { it.copy(selectedImageId = event.imageId) }
+            }
             else -> {}
         }
     }

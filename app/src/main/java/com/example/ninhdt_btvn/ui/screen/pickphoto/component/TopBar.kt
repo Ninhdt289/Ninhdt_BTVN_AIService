@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +23,8 @@ import com.example.ninhdt_btvn.R
 @Composable
 fun TopBar(
     onClose: () -> Unit,
+    onNext: () -> Unit,
+    nextEnabled: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -41,7 +45,15 @@ fun TopBar(
             text = "Next",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000)
+            color = Color(0xFF000000),
+            modifier = Modifier
+                .then(
+                    if (nextEnabled) Modifier
+                        .clickable(onClick = onNext)
+                    else Modifier
+                )
+                .alpha(if (nextEnabled) 1f else 0.3f)
+                .padding(horizontal = 12.dp, vertical = 6.dp)
         )
 
     }

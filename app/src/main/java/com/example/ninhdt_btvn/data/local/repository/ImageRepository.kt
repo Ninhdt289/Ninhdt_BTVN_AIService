@@ -66,4 +66,59 @@ class ImageRepository(private val contentResolver: ContentResolver) {
 
         return@withContext images
     }
+
+    suspend fun getImageById(imageId: Long): DeviceImage? = withContext(Dispatchers.IO) {
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DISPLAY_NAME,
+            MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.SIZE,
+            MediaStore.Images.Media.MIME_TYPE
+        )
+
+        val selection = "${MediaStore.Images.Media._ID} = ?"
+        val selectionArgs = arrayOf(imageId.toString())
+
+        try {
+            contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                    val displayNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+                    val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+                    val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+                    val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)
+
+                    val id = cursor.getLong(idColumn)
+                    val displayName = cursor.getString(displayNameColumn)
+                    val dateAdded = cursor.getLong(dateAddedColumn)
+                    val size = cursor.getLong(sizeColumn)
+                    val mimeType = cursor.getString(mimeTypeColumn)
+
+                    val contentUri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        id
+                    )
+
+                    return@withContext DeviceImage(
+                        id = id,
+                        uri = contentUri,
+                        displayName = displayName,
+                        dateAdded = dateAdded,
+                        size = size,
+                        mimeType = mimeType
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ImageRepository", "Error loading image by ID", e)
+        }
+
+        return@withContext null
+    }
 }
