@@ -2,8 +2,8 @@ package com.example.ninhdt_btvn.ui.screen.main
 
 import androidx.compose.runtime.Stable
 import android.graphics.Bitmap
+import com.example.ninhdt_btvn.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
-import com.example.ninhdt_btvn.data.remote.model.StyleResponse
 
 @Stable
 data class MainUIState(
@@ -21,7 +21,7 @@ data class MainUIState(
 
     val showStyleSelector: Boolean = false,
 
-    val selectedImageId: Long? = null
+    val selectedImage: DeviceImage? = null
 )
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
@@ -31,5 +31,5 @@ sealed class MainUIEvent {
     object ToggleStyleSelector : MainUIEvent()
     object ClearGeneratedImage : MainUIEvent()
     object NavigateToPickPhoto : MainUIEvent()
-    data class SetSelectedImage(val imageId: Long) : MainUIEvent()
+    data class SetSelectedImage(val image: DeviceImage) : MainUIEvent()
 }

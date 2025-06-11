@@ -63,7 +63,7 @@ fun MainScreen(
 
         PhotoUploadArea(
             onChangeImage = {},
-            selectedImageId = state.selectedImageId
+            selectedImage = state.selectedImage
         )
 
         when {
@@ -155,19 +155,8 @@ fun PromptInputField(
 @Composable
 fun PhotoUploadArea(
     onChangeImage: () -> Unit,
-    selectedImageId: Long? = null
+    selectedImage: DeviceImage? = null
 ) {
-    val context = LocalContext.current
-    val imageRepository = remember { ImageRepository(context.contentResolver) }
-    var selectedImage by remember { mutableStateOf<DeviceImage?>(null) }
-
-    LaunchedEffect(selectedImageId) {
-        Log.d("LaunchedEffect", "selectedImageId: $selectedImageId")
-        selectedImage = if (selectedImageId != null) {
-            imageRepository.getImageById(selectedImageId)
-        } else null
-    }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -186,7 +175,7 @@ fun PhotoUploadArea(
     ) {
         if (selectedImage != null) {
             AsyncImage(
-                model = selectedImage!!.uri,
+                model = selectedImage.uri,
                 contentDescription = "Selected image",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

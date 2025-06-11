@@ -10,6 +10,7 @@ import com.example.ninhdt_btvn.ui.screen.main.mainScreen
 import com.example.ninhdt_btvn.ui.screen.pickphoto.navigation.pickPhotoScreen
 import com.example.ninhdt_btvn.ui.screen.result.navigation.resultScreen
 
+
 @Composable
 fun ScreenNavigation(
     modifier: Modifier = Modifier,
@@ -23,12 +24,12 @@ fun ScreenNavigation(
     ) {
         mainScreen(
             onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
-
         )
 
         pickPhotoScreen(
             onClose = { navController.popBackStack() },
-            onImageSelected = {
+            onImageSelected = { selectedImage ->
+                Log.d("SelectedImage", selectedImage.toString())
                 navController.navigate(AiGenScreen.MainScreen.route)
             }
         )
