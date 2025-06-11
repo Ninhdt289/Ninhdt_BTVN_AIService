@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
     val repository = StyleRepository()
-    private val _uiState = MutableStateFlow(MainUIState())
+    val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState
 
     init {

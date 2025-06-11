@@ -36,6 +36,7 @@ import com.example.ninhdt_btvn.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.data.local.repository.ImageRepository
 import com.example.ninhdt_btvn.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.utils.PermissionUtils
+import kotlinx.coroutines.flow.update
 
 @Composable
 fun MainScreen(
@@ -77,7 +78,13 @@ fun MainScreen(
             state.errorMessage != null -> Text("Error: ${state.errorMessage}")
 
             !state.availableStyles.isNullOrEmpty() -> {
-                StyleSelectionSection(state.availableStyles)
+                StyleSelectionSection(
+                    styleList = state.availableStyles,
+                    selectedStyle = state.selectedStyle,
+                    onStyleSelected = { style ->
+                        viewModel._uiState.update { it.copy(selectedStyle = style) }
+                    }
+                )
             }
         }
 
@@ -218,24 +225,63 @@ fun PhotoUploadArea(
 }
 
 @Composable
-fun StyleSelectionSection(styleList: List<StyleCategory>?) {
+fun StyleItemCard(
+    styleItem: StyleItem,
+    isSelected: Boolean = false,
+    onSelect: (StyleItem) -> Unit
+) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(
+                    width = if (isSelected) 2.dp else 0.dp,
+                    color = Color(0xFFE400D9),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .clickable { onSelect(styleItem) }
+        ) {
+            UrlImageWithCoil(styleItem.key)
+        }
+
         Text(
-            text = stringResource(R.string.main_style_title),
-            color = Color(0xFFE400D9),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
+            text = styleItem.name,
+            fontSize = 12.sp,
+            color = if (isSelected) Color(0xFFE400D9) else Color.Black
         )
-        if (!styleList.isNullOrEmpty()) {
-            StyleTabsWithContent(styleList)
+    }
+}
+
+@Composable
+fun StyleList(
+    styles: List<StyleItem>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(styles) { styleItem ->
+            StyleItemCard(
+                styleItem = styleItem,
+                isSelected = styleItem == selectedStyle,
+                onSelect = onStyleSelected
+            )
         }
     }
 }
 
 @Composable
-fun StyleTabsWithContent(styleList: List<StyleCategory>) {
+fun StyleTabsWithContent(
+    styleList: List<StyleCategory>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     Column {
@@ -253,7 +299,7 @@ fun StyleTabsWithContent(styleList: List<StyleCategory>) {
                         .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
                         .width(16.dp)
                         .height(2.dp)
-                        .background( Color(0xFFE400D9), shape = CircleShape)
+                        .background(Color(0xFFE400D9), shape = CircleShape)
                 )
             },
             divider = {}
@@ -278,19 +324,35 @@ fun StyleTabsWithContent(styleList: List<StyleCategory>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        StyleList(styleList[selectedTabIndex].styles)
+        StyleList(
+            styles = styleList[selectedTabIndex].styles,
+            selectedStyle = selectedStyle,
+            onStyleSelected = onStyleSelected
+        )
     }
-
 }
 
 @Composable
-fun StyleList(styles: List<StyleItem>) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+fun StyleSelectionSection(
+    styleList: List<StyleCategory>?,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(styles) { styleItem ->
-            StyleItemCard(styleItem = styleItem)
+        Text(
+            text = stringResource(R.string.main_style_title),
+            color = Color(0xFFE400D9),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        if (!styleList.isNullOrEmpty()) {
+            StyleTabsWithContent(
+                styleList = styleList,
+                selectedStyle = selectedStyle,
+                onStyleSelected = onStyleSelected
+            )
         }
     }
 }
@@ -305,32 +367,6 @@ fun UrlImageWithCoil(url: String) {
             .size(100.dp)
             .clip(RoundedCornerShape(8.dp))
     )
-}
-
-@Composable
-fun StyleItemCard(styleItem: StyleItem) {
-    Log.d("StyleItemCard", "Rendering StyleItemCard with styleItem: ${styleItem.key}")
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .clickable { /* Handle style selection */ }
-        ) {
-
-            UrlImageWithCoil(styleItem.key)
-
-        }
-
-        Text(
-            text = styleItem.name,
-            fontSize = 12.sp,
-            color = Color.Black
-        )
-    }
 }
 
 @Composable

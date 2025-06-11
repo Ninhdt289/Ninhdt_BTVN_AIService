@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import android.graphics.Bitmap
 import com.example.ninhdt_btvn.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
+import com.example.ninhdt_btvn.data.remote.model.StyleItem
 
 @Stable
 data class MainUIState(
@@ -12,6 +13,8 @@ data class MainUIState(
     val generatedImage: Bitmap? = null,
 
     val availableStyles: List<StyleCategory>? = null,
+
+    val selectedStyle: StyleItem? = null,
 
     val selectedStyleId: String? = null,
 
