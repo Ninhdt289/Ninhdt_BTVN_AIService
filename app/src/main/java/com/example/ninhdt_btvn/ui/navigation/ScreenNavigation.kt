@@ -23,14 +23,21 @@ fun ScreenNavigation(
         startDestination = AiGenScreen.MainScreen.route
     ) {
         mainScreen(
+            imageUri = navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>("selected_image_uri"),
             onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
         )
 
         pickPhotoScreen(
             onClose = { navController.popBackStack() },
             onImageSelected = { selectedImage ->
-                Log.d("SelectedImage", selectedImage.toString())
-                navController.navigate(AiGenScreen.MainScreen.route)
+                /*Log.d("SelectedImage", selectedImage.toString())
+                navController.navigate(AiGenScreen.MainScreen.route)*/
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("selected_image_uri", selectedImage.uri.toString())
+                navController.popBackStack()
             }
         )
 

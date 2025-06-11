@@ -38,6 +38,7 @@ import com.example.ninhdt_btvn.utils.PermissionUtils
 
 @Composable
 fun MainScreen(
+    imageUri: String? = null,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
     onGenerate: () -> Unit = {},
@@ -49,6 +50,9 @@ fun MainScreen(
         onPermissionDenied = { }
     )
 
+    LaunchedEffect(Unit) {
+        Log.d("MainScreen", "LaunchedEffect triggered ${imageUri}")
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -63,7 +67,7 @@ fun MainScreen(
 
         PhotoUploadArea(
             onChangeImage = {},
-            selectedImage = state.selectedImage
+            selectedImage = imageUri
         )
 
         when {
@@ -155,7 +159,7 @@ fun PromptInputField(
 @Composable
 fun PhotoUploadArea(
     onChangeImage: () -> Unit,
-    selectedImage: DeviceImage? = null
+    selectedImage: String? = null
 ) {
     Box(
         modifier = Modifier
@@ -175,7 +179,7 @@ fun PhotoUploadArea(
     ) {
         if (selectedImage != null) {
             AsyncImage(
-                model = selectedImage.uri,
+                model = selectedImage,
                 contentDescription = "Selected image",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
