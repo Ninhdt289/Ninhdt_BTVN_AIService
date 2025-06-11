@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,13 +29,9 @@ import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
 import com.example.ninhdt_btvn.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
-import androidx.navigation.NavController
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.ui.platform.LocalContext
+import com.example.ninhdt_btvn.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.utils.PermissionUtils
 
 @Composable
@@ -48,7 +45,7 @@ fun MainScreen(
 
     val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
         onPermissionGranted = onGenerate,
-        onPermissionDenied = {  }
+        onPermissionDenied = { }
     )
 
     Column(
@@ -168,7 +165,7 @@ fun PhotoUploadArea(
                 color = Color.White,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable {  },
+            .clickable { },
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -194,14 +191,14 @@ fun PhotoUploadArea(
                 .align(Alignment.TopStart)
                 .size(50.dp)
                 .clickable { onChangeImage() }
-                .padding(top = 15.dp , start = 19.dp),
+                .padding(top = 15.dp, start = 19.dp),
             contentScale = ContentScale.Fit
         )
     }
 }
 
 @Composable
-fun StyleSelectionSection( styleList: List<StyleCategory>?) {
+fun StyleSelectionSection(styleList: List<StyleCategory>?) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -211,30 +208,68 @@ fun StyleSelectionSection( styleList: List<StyleCategory>?) {
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
-
-        StyleList(styleList)
+        if (!styleList.isNullOrEmpty()) {
+            StyleTabsWithContent(styleList)
+        }
     }
 }
 
 @Composable
-fun StyleList(styleList: List<StyleCategory>?) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        if (styleList != null) {
-            items(styleList[0].styles.map { styleCategory ->
-                StyleItem(
-                    name = styleCategory.name,
-                    imageResource = styleCategory.key
+fun StyleTabsWithContent(styleList: List<StyleCategory>) {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+
+    Column {
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            contentColor = Color(0xFFE400D9),
+            edgePadding = 16.dp,
+            indicator = { tabPositions ->
+                SecondaryIndicator(
+                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    height = 2.dp,
+                    color = Color(0xFFE400D9)
                 )
-            } ?: emptyList()) { item ->
-                StyleItemCard(styleItem = item)
+            },
+            divider = {}
+        ) {
+            styleList.forEachIndexed { index, category ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = {
+                        Text(
+                            text = category.name,
+                            fontSize = 14.sp,
+                            fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTabIndex == index) Color(0xFFE400D9) else Color.Gray,
+                            maxLines = 1,
+                        )
+                    }
+                )
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
 
+        StyleList(styleList[selectedTabIndex].styles)
+    }
+
+}
+
+@Composable
+fun StyleList(styles: List<StyleItem>) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(styles) { styleItem ->
+            StyleItemCard(styleItem = styleItem)
+        }
     }
 }
+
 @Composable
 fun UrlImageWithCoil(url: String) {
     AsyncImage(
@@ -246,8 +281,10 @@ fun UrlImageWithCoil(url: String) {
             .clip(RoundedCornerShape(8.dp))
     )
 }
+
 @Composable
 fun StyleItemCard(styleItem: StyleItem) {
+    Log.d("StyleItemCard", "Rendering StyleItemCard with styleItem: ${styleItem.key}")
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -259,13 +296,8 @@ fun StyleItemCard(styleItem: StyleItem) {
                 .clickable { /* Handle style selection */ }
         ) {
 
-            UrlImageWithCoil(styleItem.imageResource)
+            UrlImageWithCoil(styleItem.key)
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.LightGray)
-            )
         }
 
         Text(
@@ -308,10 +340,10 @@ fun GenerateButton(
     }
 }
 
-data class StyleItem(
+/*data class StyleItem(
     val name: String,
     val imageResource: String
-)
+)*/
 
 @Preview(showBackground = true)
 @Composable

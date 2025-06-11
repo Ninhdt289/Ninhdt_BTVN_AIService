@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -38,34 +39,45 @@ fun DeviceImageItem(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         if (isSelected) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Blue.copy(alpha = 0.3f))
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFFE400D9),
+                                Color(0xFF1D00F5)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+            }
+        }
+        else
+        {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Color.White.copy(alpha = 0.5f)
+                    ),
             )
         }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .size(24.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isSelected) Color.Blue else Color.White.copy(alpha = 0.8f)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
     }
 }
