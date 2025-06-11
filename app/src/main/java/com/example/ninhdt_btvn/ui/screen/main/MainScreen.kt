@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
@@ -181,8 +182,9 @@ fun PhotoUploadArea(
             AsyncImage(
                 model = selectedImage,
                 contentDescription = "Selected image",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Fit
             )
         } else {
             Column(
@@ -241,12 +243,17 @@ fun StyleTabsWithContent(styleList: List<StyleCategory>) {
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
             contentColor = Color(0xFFE400D9),
-            edgePadding = 16.dp,
+            edgePadding = 2.dp,
             indicator = { tabPositions ->
-                SecondaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    height = 2.dp,
-                    color = Color(0xFFE400D9)
+                val currentTab = tabPositions[selectedTabIndex]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.BottomStart)
+                        .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
+                        .width(16.dp)
+                        .height(2.dp)
+                        .background( Color(0xFFE400D9), shape = CircleShape)
                 )
             },
             divider = {}
