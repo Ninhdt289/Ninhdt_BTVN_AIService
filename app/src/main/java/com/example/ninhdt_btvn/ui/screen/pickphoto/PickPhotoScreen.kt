@@ -17,12 +17,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ninhdt_btvn.data.local.model.DeviceImage
 
 
 @Composable
 fun PickPhotoScreen(
     onClose: () -> Unit = {},
-    onNext: () -> Unit = {}
+    onNext: () -> Unit = {},
+    onImageSelected: (DeviceImage) -> Unit = {}
 ) {
     val context = LocalContext.current
     val imageRepository = remember { ImageRepository(context.contentResolver) }
@@ -46,19 +48,17 @@ fun PickPhotoScreen(
         }
     }
 
-
-    val handleNext = {
-        val selectedImageId = uiState.selectedImageId
-        val selectedImage = uiState.images.find { it.id == selectedImageId }
-        selectedImage?.let {
-            println("Selected image: ${it.id}")
-        }
-    }
-
     Scaffold(
         topBar = {
             TopBar(
                 onClose = onClose,
+                onNext = {
+                    uiState.selectedImage?.let { selectedImage ->
+                        onImageSelected(selectedImage)
+                        onNext()
+                    }
+                },
+                nextEnabled = uiState.selectedImage != null
             )
         },
         containerColor = Color.White
@@ -87,7 +87,7 @@ fun PickPhotoScreen(
         } else {
             DeviceImageGallery(
                 images = uiState.images,
-                selectedImageId = uiState.selectedImageId,
+                selectedImageId = uiState.selectedImage?.id,
                 onToggleImage = viewModel::toggleImageSelection,
                 isLoading = uiState.isLoading,
                 modifier = Modifier

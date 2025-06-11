@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import com.example.ninhdt_btvn.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.ui.navigation.PickPhotoRoute
 import com.example.ninhdt_btvn.ui.screen.pickphoto.PickPhotoScreen
 
@@ -11,11 +12,13 @@ fun NavController.navigateToPickPhoto(navOptions: NavOptions) = navigate(route =
 
 fun NavGraphBuilder.pickPhotoScreen(
     onClose: () -> Unit,
+    onImageSelected: (DeviceImage) -> Unit
 ) {
     composable(route = PickPhotoRoute.route) {
         PickPhotoScreen(
-            onClose = onClose ,
-            onNext = { }
+            onClose = onClose,
+            onNext = { },
+            onImageSelected = onImageSelected
         )
     }
 }

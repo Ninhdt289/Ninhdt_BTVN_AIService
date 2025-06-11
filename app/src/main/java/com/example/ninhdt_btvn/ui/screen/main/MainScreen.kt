@@ -31,6 +31,8 @@ import com.example.ninhdt_btvn.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.ui.platform.LocalContext
+import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.ninhdt_btvn.data.local.repository.ImageRepository
 import com.example.ninhdt_btvn.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.utils.PermissionUtils
 
@@ -42,7 +44,6 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
-
     val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
         onPermissionGranted = onGenerate,
         onPermissionDenied = { }
@@ -60,7 +61,10 @@ fun MainScreen(
             onClearClick = { viewModel.onEvent(MainUIEvent.UpdatePromptText("")) }
         )
 
-        PhotoUploadArea(onChangeImage = {})
+        PhotoUploadArea(
+            onChangeImage = {},
+            selectedImage = state.selectedImage
+        )
 
         when {
             state.isGenerating -> Text("Loading styles...")
@@ -150,7 +154,8 @@ fun PromptInputField(
 
 @Composable
 fun PhotoUploadArea(
-    onChangeImage: () -> Unit
+    onChangeImage: () -> Unit,
+    selectedImage: DeviceImage? = null
 ) {
     Box(
         modifier = Modifier
@@ -168,21 +173,30 @@ fun PhotoUploadArea(
             .clickable { },
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_main_image),
-                contentDescription = "Add photo",
-                modifier = Modifier.size(80.dp),
+        if (selectedImage != null) {
+            AsyncImage(
+                model = selectedImage.uri,
+                contentDescription = "Selected image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_main_image),
+                    contentDescription = "Add photo",
+                    modifier = Modifier.size(80.dp),
+                )
 
-            Text(
-                text = stringResource(R.string.main_image_title),
-                color = Color.Gray,
-                fontSize = 16.sp
-            )
+                Text(
+                    text = stringResource(R.string.main_image_title),
+                    color = Color.Gray,
+                    fontSize = 16.sp
+                )
+            }
         }
         Image(
             painter = painterResource(id = R.drawable.ic_main_change_image),
