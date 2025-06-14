@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
-
 class PickPhotoViewModel(
     private val imageRepository: ImageRepository
 ) : ViewModel() {
@@ -18,14 +16,26 @@ class PickPhotoViewModel(
     private val _uiState = MutableStateFlow(PickPhotoUiState())
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
 
-    fun loadImages() {
+    private val pageSize = 50
+
+    fun loadImages(loadMore: Boolean = false) {
+        if (_uiState.value.isLoading || (!loadMore && !_uiState.value.hasMoreImages)) return
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                val images = imageRepository.getDeviceImages()
+                val currentPage = if (loadMore) _uiState.value.currentPage + 1 else 0
+                val offset = currentPage * pageSize
+                
+                val images = imageRepository.getDeviceImages(offset, pageSize)
+                val totalImages = imageRepository.getTotalImageCount()
+                
                 _uiState.value = _uiState.value.copy(
-                    images = images,
-                    isLoading = false
+                    images = if (loadMore) _uiState.value.images + images else images,
+                    isLoading = false,
+                    currentPage = currentPage,
+                    totalImages = totalImages,
+                    hasMoreImages = (offset + images.size) < totalImages
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)

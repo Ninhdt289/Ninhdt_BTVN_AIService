@@ -9,6 +9,7 @@ import com.example.ninhdt_btvn.utils.PermissionUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +21,8 @@ import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.ui.tooling.preview.Preview
-
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 @Composable
 fun PickPhotoScreen(
@@ -30,8 +32,9 @@ fun PickPhotoScreen(
     viewModel: PickPhotoViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-
     val uiState by viewModel.uiState.collectAsState()
+    val lazyGridState = rememberLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -47,6 +50,17 @@ fun PickPhotoScreen(
         } else {
             permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
         }
+    }
+
+    // Handle lazy loading
+    LaunchedEffect(lazyGridState) {
+        snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastIndex ->
+                if (lastIndex != null && lastIndex >= uiState.images.size - 5) {
+                    viewModel.loadImages(loadMore = true)
+                }
+            }
     }
 
     Scaffold(
@@ -86,15 +100,26 @@ fun PickPhotoScreen(
                 }
             }
         } else {
-            DeviceImageGallery(
-                images = uiState.images,
-                selectedImageId = uiState.selectedImage?.id,
-                onToggleImage = viewModel::toggleImageSelection,
-                isLoading = uiState.isLoading,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                DeviceImageGallery(
+                    images = uiState.images,
+                    selectedImageId = uiState.selectedImage?.id,
+                    onToggleImage = viewModel::toggleImageSelection,
+                    isLoading = uiState.isLoading,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    lazyGridState = lazyGridState
+                )
+                
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(16.dp)
+                    )
+                }
+            }
         }
     }
 }
