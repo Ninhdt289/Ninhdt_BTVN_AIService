@@ -31,6 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.platform.LocalContext
 import com.example.aisevice.data.remote.model.Config
 import com.example.aisevice.data.remote.model.Domain
+import com.example.aisevice.data.remote.model.StyleCategory
 import com.example.aisevice.data.remote.model.StyleItem
 import com.example.aisevice.data.remote.model.ThumbnailItem
 import com.example.aisevice.data.remote.model.ThumbnailUrls
@@ -67,7 +68,12 @@ fun MainScreen(
         )
 
         PhotoUploadArea(
-            onChangeImage = {},
+            onChangeImage = {  viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+                if (PermissionUtils.hasImagePermissions(context)) {
+                    onGenerate()
+                } else {
+                    permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
+                }},
             selectedImage = imageUri
         )
 
@@ -90,12 +96,7 @@ fun MainScreen(
         Spacer(modifier = Modifier.weight(1f))
         GenerateButton(
             onClick = {
-                viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
-                if (PermissionUtils.hasImagePermissions(context)) {
-                    onGenerate()
-                } else {
-                    permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
-                }
+
             }
         )
         Spacer(modifier = Modifier.height(50.dp))
@@ -181,7 +182,7 @@ fun PhotoUploadArea(
                 color = Color.White,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable { },
+            .clickable { onChangeImage() },
         contentAlignment = Alignment.Center
     ) {
         if (selectedImage != null) {
@@ -190,6 +191,17 @@ fun PhotoUploadArea(
                 contentDescription = "Selected image",
                 modifier = Modifier.fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Fit
+            )
+            
+            Image(
+                painter = painterResource(id = R.drawable.ic_main_change_image),
+                contentDescription = "Change image",
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .size(50.dp)
+                    .clickable { onChangeImage() }
+                    .padding(top = 15.dp, start = 19.dp),
                 contentScale = ContentScale.Fit
             )
         } else {
@@ -210,16 +222,6 @@ fun PhotoUploadArea(
                 )
             }
         }
-        Image(
-            painter = painterResource(id = R.drawable.ic_main_change_image),
-            contentDescription = "Clear text",
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .size(50.dp)
-                .clickable { onChangeImage() }
-                .padding(top = 15.dp, start = 19.dp),
-            contentScale = ContentScale.Fit
-        )
     }
 }
 
@@ -257,9 +259,9 @@ fun StyleItemCard(
 
 @Composable
 fun StyleList(
-    styles: List<com.example.aisevice.data.remote.model.StyleItem>,
-    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
-    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
+    styles: List<StyleItem>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -277,9 +279,9 @@ fun StyleList(
 
 @Composable
 fun StyleTabsWithContent(
-    styleList: List<com.example.aisevice.data.remote.model.StyleCategory>,
-    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
-    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
+    styleList: List<StyleCategory>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -333,9 +335,9 @@ fun StyleTabsWithContent(
 
 @Composable
 fun StyleSelectionSection(
-    styleList: List<com.example.aisevice.data.remote.model.StyleCategory>?,
-    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
-    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
+    styleList: List<StyleCategory>?,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
