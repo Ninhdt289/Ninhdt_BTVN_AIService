@@ -1,5 +1,7 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto
 
+import android.annotation.SuppressLint
+import android.net.Uri
 import com.example.aisevice.data.local.impl.ImageRepositoryImpl
 import com.example.ninhdt_btvn.ui.screen.pickphoto.component.DeviceImageGallery
 import com.example.ninhdt_btvn.ui.screen.pickphoto.component.TopBar
@@ -17,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import com.example.aisevice.data.local.model.DeviceImage
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
@@ -94,4 +97,75 @@ fun PickPhotoScreen(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopBarPreview() {
+    TopBar(
+        onClose = {},
+        onNext = {},
+        nextEnabled = true
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DeviceImageGalleryPreview() {
+    val sampleImages = listOf(
+        DeviceImage(
+            id = 1,
+            uri = Uri.parse("content://media/external/images/media/1"),
+            size = 1024,
+            dateAdded = System.currentTimeMillis(),
+            mimeType = "",
+            displayName = ""
+        ),
+        DeviceImage(
+            id = 2,
+            uri = Uri.parse("content://media/external/images/media/1"),
+            size = 1024,
+            dateAdded = System.currentTimeMillis(),
+            mimeType = "",
+            displayName = ""
+        )
+    )
+    
+    DeviceImageGallery(
+        images = sampleImages,
+        selectedImageId = 1,
+        onToggleImage = {},
+        isLoading = false,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@SuppressLint("ViewModelConstructorInComposable")
+@Preview(showBackground = true)
+@Composable
+private fun PickPhotoScreenPreview() {
+    val mockViewModel = PickPhotoViewModel(
+        imageRepository = ImageRepositoryImpl(LocalContext.current.contentResolver)
+    )
+    PickPhotoScreen(
+        onClose = {},
+        onNext = {},
+        onImageSelected = {},
+        viewModel = mockViewModel
+    )
+}
+
+@SuppressLint("ViewModelConstructorInComposable")
+@Preview(showBackground = true)
+@Composable
+private fun PickPhotoScreenWithPermissionDeniedPreview() {
+    val mockViewModel = PickPhotoViewModel(
+        imageRepository = ImageRepositoryImpl(LocalContext.current.contentResolver)
+    )
+    PickPhotoScreen(
+        onClose = {},
+        onNext = {},
+        onImageSelected = {},
+        viewModel = mockViewModel
+    )
 }

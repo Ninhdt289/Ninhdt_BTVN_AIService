@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 
 class PickPhotoViewModel(
-    private val imageRepository: ImageRepositoryImpl
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PickPhotoUiState())
