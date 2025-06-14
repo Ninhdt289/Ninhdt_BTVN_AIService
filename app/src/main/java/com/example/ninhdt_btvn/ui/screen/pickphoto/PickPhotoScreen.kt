@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import com.example.aisevice.data.local.model.DeviceImage
 
 
@@ -23,11 +23,10 @@ import com.example.aisevice.data.local.model.DeviceImage
 fun PickPhotoScreen(
     onClose: () -> Unit = {},
     onNext: () -> Unit = {},
-    onImageSelected: (DeviceImage) -> Unit = {}
+    onImageSelected: (DeviceImage) -> Unit = {},
+    viewModel: PickPhotoViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val imageRepository = remember { ImageRepositoryImpl(context.contentResolver) }
-    val viewModel: PickPhotoViewModel = viewModel { PickPhotoViewModel(imageRepository) }
 
     val uiState by viewModel.uiState.collectAsState()
 

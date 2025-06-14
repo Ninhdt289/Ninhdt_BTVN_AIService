@@ -10,8 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-class ImageRepositoryImpl(private val contentResolver: ContentResolver) {
- suspend fun getDeviceImages(): List<DeviceImage> = withContext(Dispatchers.IO) {
+class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageRepository {
+    override suspend fun getDeviceImages(): List<DeviceImage> = withContext(Dispatchers.IO) {
 
         val images = mutableListOf<DeviceImage>()
 
