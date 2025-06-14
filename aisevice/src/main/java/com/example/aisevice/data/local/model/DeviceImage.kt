@@ -1,4 +1,4 @@
-package com.example.ninhdt_btvn.data.local.model
+package com.example.aisevice.data.local.model
 
 import android.net.Uri
 

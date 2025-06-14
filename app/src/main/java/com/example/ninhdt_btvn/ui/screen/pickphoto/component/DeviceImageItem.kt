@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.aisevice.data.local.model.DeviceImage
 
 @Composable
 fun DeviceImageItem(

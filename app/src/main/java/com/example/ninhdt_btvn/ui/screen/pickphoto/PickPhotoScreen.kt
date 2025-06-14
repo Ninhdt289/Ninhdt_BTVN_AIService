@@ -1,7 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto
 
-import android.util.Log
-import com.example.ninhdt_btvn.data.local.repository.ImageRepository
+import com.example.aisevice.data.local.impl.ImageRepositoryImpl
 import com.example.ninhdt_btvn.ui.screen.pickphoto.component.DeviceImageGallery
 import com.example.ninhdt_btvn.ui.screen.pickphoto.component.TopBar
 import com.example.ninhdt_btvn.utils.PermissionUtils
@@ -17,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.aisevice.data.local.model.DeviceImage
 
 
 @Composable
@@ -27,7 +26,7 @@ fun PickPhotoScreen(
     onImageSelected: (DeviceImage) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val imageRepository = remember { ImageRepository(context.contentResolver) }
+    val imageRepository = remember { ImageRepositoryImpl(context.contentResolver) }
     val viewModel: PickPhotoViewModel = viewModel { PickPhotoViewModel(imageRepository) }
 
     val uiState by viewModel.uiState.collectAsState()

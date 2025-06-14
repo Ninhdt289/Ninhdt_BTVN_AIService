@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.Stable
 import com.example.aisevice.data.remote.model.StyleCategory
 import com.example.aisevice.data.remote.model.StyleItem
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.aisevice.data.local.model.DeviceImage
 
 @Stable
 data class MainUIState(

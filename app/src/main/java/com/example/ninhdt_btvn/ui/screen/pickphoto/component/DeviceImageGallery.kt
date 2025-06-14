@@ -1,6 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto.component
 
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid

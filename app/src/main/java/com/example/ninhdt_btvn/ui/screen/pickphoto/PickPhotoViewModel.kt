@@ -2,8 +2,8 @@ package com.example.ninhdt_btvn.ui.screen.pickphoto
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
-import com.example.ninhdt_btvn.data.local.repository.ImageRepository
+import com.example.aisevice.data.local.impl.ImageRepositoryImpl
+import com.example.aisevice.data.local.repository.ImageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 
 class PickPhotoViewModel(
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepositoryImpl
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PickPhotoUiState())

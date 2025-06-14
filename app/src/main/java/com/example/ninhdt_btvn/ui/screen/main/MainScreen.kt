@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,13 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
-import com.example.aisevice.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.ui.platform.LocalContext
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
-import com.example.ninhdt_btvn.data.local.repository.ImageRepository
-import com.example.aisevice.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.utils.PermissionUtils
 import kotlinx.coroutines.flow.update
 
