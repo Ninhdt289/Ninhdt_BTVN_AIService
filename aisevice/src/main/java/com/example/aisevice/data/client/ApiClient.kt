@@ -1,6 +1,6 @@
-package com.example.ninhdt_btvn.data.client
+package com.example.aisevice.data.client
 
-import com.example.ninhdt_btvn.data.remote.request.StyleAPI
+import com.example.aisevice.data.remote.request.StyleAPI
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

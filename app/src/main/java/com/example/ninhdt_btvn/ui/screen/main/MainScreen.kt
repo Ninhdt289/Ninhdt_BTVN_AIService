@@ -28,13 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
-import com.example.ninhdt_btvn.data.remote.model.StyleCategory
+import com.example.aisevice.data.remote.model.StyleCategory
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.ui.platform.LocalContext
 import com.example.ninhdt_btvn.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.data.local.repository.ImageRepository
-import com.example.ninhdt_btvn.data.remote.model.StyleItem
+import com.example.aisevice.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.utils.PermissionUtils
 import kotlinx.coroutines.flow.update
 
@@ -226,9 +226,9 @@ fun PhotoUploadArea(
 
 @Composable
 fun StyleItemCard(
-    styleItem: StyleItem,
+    styleItem: com.example.aisevice.data.remote.model.StyleItem,
     isSelected: Boolean = false,
-    onSelect: (StyleItem) -> Unit
+    onSelect: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -258,9 +258,9 @@ fun StyleItemCard(
 
 @Composable
 fun StyleList(
-    styles: List<StyleItem>,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
+    styles: List<com.example.aisevice.data.remote.model.StyleItem>,
+    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
+    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -278,9 +278,9 @@ fun StyleList(
 
 @Composable
 fun StyleTabsWithContent(
-    styleList: List<StyleCategory>,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
+    styleList: List<com.example.aisevice.data.remote.model.StyleCategory>,
+    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
+    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -334,9 +334,9 @@ fun StyleTabsWithContent(
 
 @Composable
 fun StyleSelectionSection(
-    styleList: List<StyleCategory>?,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
+    styleList: List<com.example.aisevice.data.remote.model.StyleCategory>?,
+    selectedStyle: com.example.aisevice.data.remote.model.StyleItem?,
+    onStyleSelected: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)

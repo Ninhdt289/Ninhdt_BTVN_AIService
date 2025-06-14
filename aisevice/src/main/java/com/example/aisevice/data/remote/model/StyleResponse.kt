@@ -1,4 +1,4 @@
-package com.example.ninhdt_btvn.data.remote.model
+package com.example.aisevice.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 

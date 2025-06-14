@@ -2,7 +2,7 @@ package com.example.ninhdt_btvn.ui.screen.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ninhdt_btvn.data.remote.repository.StyleRepository
+import com.example.aisevice.data.remote.repository.StyleRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

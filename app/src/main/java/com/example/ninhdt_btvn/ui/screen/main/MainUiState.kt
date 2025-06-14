@@ -1,10 +1,10 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
-import androidx.compose.runtime.Stable
 import android.graphics.Bitmap
+import androidx.compose.runtime.Stable
+import com.example.aisevice.data.remote.model.StyleCategory
+import com.example.aisevice.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.data.local.model.DeviceImage
-import com.example.ninhdt_btvn.data.remote.model.StyleCategory
-import com.example.ninhdt_btvn.data.remote.model.StyleItem
 
 @Stable
 data class MainUIState(

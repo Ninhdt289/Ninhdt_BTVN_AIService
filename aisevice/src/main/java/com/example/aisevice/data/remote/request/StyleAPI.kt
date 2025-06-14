@@ -1,7 +1,7 @@
-package com.example.ninhdt_btvn.data.remote.request
+package com.example.aisevice.data.remote.request
 
-import com.example.ninhdt_btvn.data.remote.model.BaseResponse
-import com.example.ninhdt_btvn.data.remote.model.StyleResponse
+import com.example.aisevice.data.remote.model.BaseResponse
+import com.example.aisevice.data.remote.model.StyleResponse
 import retrofit2.http.GET
 
 interface StyleAPI {

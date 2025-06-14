@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "NinhDT_BTVN"
 include(":app")
- 
+include(":aisevice")
