@@ -42,14 +42,16 @@ internal class HandlerApiWithImageImpl(
         withContext(Dispatchers.IO) {
             try {
                 val link = preSignLink()
-                Log.d("ActivityTest", "$link")
+
+                Log.d("PushImageToServer", "$link")
                 if (link.isSuccessful) {
+                    Log.d("PushImageToServer", "callApiWithImages Link: $link")
                     val body = link.body()
                     val url = body?.data?.url ?: ""
                     val path = body?.data?.path ?: ""
                     val responsePushImage = pushImageToServer(url, pathImage, folderName,context)
                     if (responsePushImage is ResponseState.Success) {
-
+                        Log.d("PushImageToServer", "callApiWithImages PushImage: $responsePushImage")
                         val response = callApi(path)
                         if (response is ResponseState.Success && response.data != null) {
                             return@withContext FileHelper.downloadAndSaveFile(
@@ -58,13 +60,14 @@ internal class HandlerApiWithImageImpl(
                                 context
                             )
                         } else {
+                            Log.d("PushImageToServer", "callApiWithImages Error: $response")
                             return@withContext ResponseState.Error(
                                 (response as? ResponseState.Error)?.error ?: Throwable("Unknown error"),
                                 CODE_UNKNOWN_ERROR
                             )
                         }
                     } else {
-
+                        Log.d("PushImageToServer", "callApiWithImages Error: $responsePushImage")
                         ResponseState.Error(
                             (responsePushImage as? ResponseState.Error)?.error
                                 ?: Throwable("Unknown error"),
@@ -110,7 +113,9 @@ internal class HandlerApiWithImageImpl(
             try {
                 val linkImages = pathImage.map {
                     val link = preSignLink()
+                    Log.d("PushImageToServer", "callApiWithImages Link: $link")
                     if (link.isSuccessful) {
+                        Log.d("PushImageToServer", "callApiWithImages isSuccessful Link: ${link.body()}")
                         val body = link.body()
                         val url = body?.data?.url ?: ""
                         val path = body?.data?.path ?: ""
@@ -124,6 +129,7 @@ internal class HandlerApiWithImageImpl(
                             )
                         }
                     } else {
+                        Log.d("PushImageToServer", "callApiWithImages isNotSuccessful Link: ${link.errorBody()}")
                         throw ErrorPresignedLink(
                             message = link.message(),
                             code = link.code()
@@ -175,27 +181,33 @@ internal class HandlerApiWithImageImpl(
         context: Context
     ): ResponseState<String, Throwable> = withTimeoutOrNull(TIME_OUT_DURATION) {
         withContext(Dispatchers.IO) {
+            Log.d("PushImageToServer", "Bắt đầu upload file: $file lên url: $url")
             val inputFile = File(file.preProcessingPath(folderName = folderName, context = context))
+            Log.d("PushImageToServer", "Đường dẫn file sau preProcessing: ${inputFile.absolutePath}")
             when {
                 !inputFile.exists() -> {
+                    Log.d("PushImageToServer", "File không tồn tại: ${inputFile.absolutePath}")
                     return@withContext ResponseState.Error(
                         IOException("File does not exist"),
                         -1
                     )
                 }
-
                 !inputFile.canRead() -> {
+                    Log.d("PushImageToServer", "Không thể đọc file: ${inputFile.absolutePath}")
                     return@withContext ResponseState.Error(
                         IOException("Cannot read file"),
                         -1
                     )
                 }
             }
+            Log.d("PushImageToServer", "Bắt đầu gọi pushImageService.pushImageToServer...")
             val response = pushImageService.pushImageToServer(url, createRequestBody(inputFile))
-            Log.d("Clothes_activity", "responsePushImage: $response")
+            Log.d("PushImageToServer", "Kết quả response: $response")
             if (response.isSuccessful) {
+                Log.d("PushImageToServer", "Upload thành công!")
                 ResponseState.Success(response.body()?.string() ?: "")
             } else {
+                Log.e("PushImageToServer", "Upload thất bại: ${response.message()} | code: ${response.code()}")
                 ResponseState.Error(
                     ErrorPushImage(
                         message = response.message()
@@ -207,7 +219,6 @@ internal class HandlerApiWithImageImpl(
                         code = response.code(),
                     ), response.code()
                 )
-
             }
         }
     } ?: ResponseState.Error(

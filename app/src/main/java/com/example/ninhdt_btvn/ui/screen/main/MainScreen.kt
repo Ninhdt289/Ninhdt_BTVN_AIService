@@ -113,9 +113,10 @@ fun MainScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+        val context = LocalContext.current
         GenerateButton(
             onClick = { Log.d("GenerateButton", "Button clicked")
-                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri))
+                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri),context)
             },
             enabled = !state.isGenerating && state.selectedImage != null
         )

@@ -6,7 +6,7 @@ import com.example.aisevice.data.remote.model.ResponseState
 import retrofit2.Response
 import java.io.File
 
-internal interface HandlerApiWithImageRepo {
+interface HandlerApiWithImageRepo {
     suspend fun callApiWithImage(
         pathImage: String,
         preSignLink: suspend () -> Response<PresignedUrlResponse>,

@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.aisevice.data.remote.model.ResponseState
+import java.io.File
+import com.example.aisevice.data.remote.request.AiArtRequest
 
 class MainViewModel(
     private val repository: StyleRepository,
@@ -51,7 +55,7 @@ class MainViewModel(
         }
     }
 
-    fun onEvent(event: MainUIEvent) {
+    fun onEvent(event: MainUIEvent,context: Context? = null ) {
         when (event) {
             is MainUIEvent.UpdatePromptText -> {
                 _uiState.update { it.copy(promptText = event.text) }
@@ -73,7 +77,7 @@ class MainViewModel(
             }
             is MainUIEvent.GenerateImage -> {
                 Log.d("GenerateImage", "Generating image with prompt: ${_uiState.value.promptText}")
-                generateImage(event.uri)
+                generateImage(context!!, event.uri)
             }
             MainUIEvent.ClearGeneratedImage -> {
                 _uiState.update { it.copy(generatedImage = null) }
@@ -91,31 +95,63 @@ class MainViewModel(
         }
     }
 
-    private fun generateImage(uri: String?) {
-        Log.d("GenerateImage", "uri: $uri")
+    private fun generateImage(context: Context, uri: String?) {
+        Log.d("GenerateImage", "Bắt đầu generateImage với uri: $uri")
         val selectedImage = uri
+        val styleId = _uiState.value.selectedStyleId ?: _uiState.value.selectedStyle?.id
+        val prompt = _uiState.value.promptText
+
         if (selectedImage == null) {
+            Log.d("GenerateImage", "Chưa chọn ảnh")
             _uiState.update { it.copy(errorMessage = "Please select an image first") }
+            return
+        }
+        if (styleId == null) {
+            Log.d("GenerateImage", "Chưa chọn style")
+            _uiState.update { it.copy(errorMessage = "Please select a style first") }
             return
         }
 
         viewModelScope.launch {
+            Log.d("GenerateImage", "Bắt đầu upload ảnh lên cloud...")
             _uiState.update { it.copy(isGenerating = true, errorMessage = null) }
-            
-            imageUploadRepository.uploadImage(
-                Uri.parse(selectedImage))
-                .onSuccess { path ->
-                    _uiState.update { 
-                        it.copy(
-                            isGenerating = false,
-                            errorMessage = null
-                        )
-                    }
-                    Log.d("Uploaded image path", path)
-                    // TODO: Call API to generate image with the uploaded path
+
+            imageUploadRepository.uploadImage(Uri.parse(selectedImage))
+                .onSuccess { uploadedPath ->
+                    Log.d("GenerateImage", "Upload thành công. Path trên cloud: $uploadedPath. Bắt đầu gen AI art...")
+
+                    val request = AiArtRequest(
+                        file = uploadedPath, // Sử dụng path đã upload thành công
+                        styleId = styleId,
+                        positivePrompt = prompt,
+                        negativePrompt = null,
+                        imageSize = null
+                    )
+
+                    imageUploadRepository.generateArt(request)
+                        .onSuccess { response ->
+                            Log.d("GenerateImage", "Gen AI art thành công: ${response.isSuccessful}")
+                            _uiState.update {
+                                it.copy(
+                                    isGenerating = false,
+                                    errorMessage = null,
+                                    imageUrl = "response.data "// hoặc response.data.url nếu body là object có url
+                                )
+                            }
+                        }
+                        .onFailure { error ->
+                            Log.d("GenerateImage", "Gen AI art thất bại: ${error.message}")
+                            _uiState.update {
+                                it.copy(
+                                    isGenerating = false,
+                                    errorMessage = error.message ?: "Failed to generate image"
+                                )
+                            }
+                        }
                 }
                 .onFailure { error ->
-                    _uiState.update { 
+                    Log.d("GenerateImage", "Upload ảnh thất bại: ${error.message}")
+                    _uiState.update {
                         it.copy(
                             isGenerating = false,
                             errorMessage = error.message ?: "Failed to upload image"
