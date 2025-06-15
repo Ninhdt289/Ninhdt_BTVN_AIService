@@ -9,7 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ninhdt_btvn.ui.screen.main.mainScreen
 import com.example.ninhdt_btvn.ui.screen.pickphoto.navigation.pickPhotoScreen
 import com.example.ninhdt_btvn.ui.screen.result.navigation.resultScreen
-
+import org.koin.androidx.compose.koinViewModel
+import com.example.ninhdt_btvn.ui.screen.result.ResultViewModel
 
 @Composable
 fun ScreenNavigation(
@@ -17,23 +18,26 @@ fun ScreenNavigation(
     navController: NavHostController = rememberNavController()
 ) {
 
+
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = AiGenScreen.MainScreen.route
     ) {
         mainScreen(
-            imageUri = navController.currentBackStackEntry
-                ?.savedStateHandle
-                ?.get<String>("selected_image_uri"),
-            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
+            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
+            onImageGenerated = { imageUrl ->
+                Log.d("ScreenNavigationninhdt22", "Image generated: $imageUrl")
+                navController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("result_image_uri", imageUrl)
+                navController.navigate(AiGenScreen.ResultScreen.route)
+            }
         )
 
         pickPhotoScreen(
             onClose = { navController.popBackStack() },
             onImageSelected = { selectedImage ->
-                /*Log.d("SelectedImage", selectedImage.toString())
-                navController.navigate(AiGenScreen.MainScreen.route)*/
                 navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.set("selected_image_uri", selectedImage.uri.toString())
@@ -41,6 +45,9 @@ fun ScreenNavigation(
             }
         )
 
-        resultScreen()
+        resultScreen(
+            onBackClick = { navController.popBackStack() },
+            onGenerateClick = { navController.navigate(AiGenScreen.MainScreen.route) }
+        )
     }
 }

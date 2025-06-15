@@ -44,6 +44,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
     onGenerate: () -> Unit = {},
+    onImageSelected: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
@@ -116,7 +117,7 @@ fun MainScreen(
         val context = LocalContext.current
         GenerateButton(
             onClick = { Log.d("GenerateButton", "Button clicked")
-                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri),context)
+                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected),context)
             },
             enabled = !state.isGenerating && state.selectedImage != null
         )
@@ -251,9 +252,9 @@ fun PhotoUploadArea(
 
 @Composable
 fun StyleItemCard(
-    styleItem: com.example.aisevice.data.remote.model.StyleItem,
+    styleItem: StyleItem,
     isSelected: Boolean = false,
-    onSelect: (com.example.aisevice.data.remote.model.StyleItem) -> Unit
+    onSelect: (StyleItem) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

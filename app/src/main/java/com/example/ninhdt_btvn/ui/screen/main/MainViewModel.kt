@@ -55,7 +55,7 @@ class MainViewModel(
         }
     }
 
-    fun onEvent(event: MainUIEvent,context: Context? = null ) {
+    fun onEvent(event: MainUIEvent, context: Context? = null) {
         when (event) {
             is MainUIEvent.UpdatePromptText -> {
                 _uiState.update { it.copy(promptText = event.text) }
@@ -67,7 +67,7 @@ class MainViewModel(
                 // Handle navigation to photo picker
             }
             is MainUIEvent.SetSelectedImage -> {
-                _uiState.update { it.copy(selectedImage = event.image) }
+                _uiState.update { it.copy(imageUrl = event.image) }
             }
             is MainUIEvent.SelectStyle -> {
                 selectStyle(event.styleId)
@@ -77,7 +77,7 @@ class MainViewModel(
             }
             is MainUIEvent.GenerateImage -> {
                 Log.d("GenerateImage", "Generating image with prompt: ${_uiState.value.promptText}")
-                generateImage(context!!, event.uri)
+                generateImage(context!!, event.uri, event.onImageGenerated)
             }
             MainUIEvent.ClearGeneratedImage -> {
                 _uiState.update { it.copy(generatedImage = null) }
@@ -95,7 +95,7 @@ class MainViewModel(
         }
     }
 
-    private fun generateImage(context: Context, uri: String?) {
+    private fun generateImage(context: Context, uri: String?, onImageGenerated: (String) -> Unit) {
         Log.d("GenerateImage", "Bắt đầu generateImage với uri: $uri")
         val selectedImage = uri
         val styleId = _uiState.value.selectedStyleId ?: _uiState.value.selectedStyle?.id
@@ -121,7 +121,7 @@ class MainViewModel(
                     Log.d("GenerateImage", "Upload thành công. Path trên cloud: $uploadedPath. Bắt đầu gen AI art...")
 
                     val request = AiArtRequest(
-                        file = uploadedPath, // Sử dụng path đã upload thành công
+                        file = uploadedPath,
                         styleId = styleId,
                         positivePrompt = prompt,
                         negativePrompt = null,
@@ -130,14 +130,16 @@ class MainViewModel(
 
                     imageUploadRepository.generateArt(request)
                         .onSuccess { response ->
-                            Log.d("GenerateImage", "Gen AI art thành công: ${response.isSuccessful}")
+                            Log.d("GenerateImage", "Gen AI art thành công: ${response.body()?.data?.url}")
+                            val imageUrl = response.body()?.data?.url ?: ""
                             _uiState.update {
                                 it.copy(
                                     isGenerating = false,
                                     errorMessage = null,
-                                    imageUrl = "response.data "// hoặc response.data.url nếu body là object có url
+                                    imageUrl = imageUrl
                                 )
                             }
+                            onImageGenerated(imageUrl)
                         }
                         .onFailure { error ->
                             Log.d("GenerateImage", "Gen AI art thất bại: ${error.message}")

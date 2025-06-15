@@ -30,11 +30,14 @@ data class MainUIState(
 )
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
+    data object ClearError : MainUIEvent()
+    data object NavigateToPickPhoto : MainUIEvent()
+    data class SetSelectedImage(val image: String) : MainUIEvent()
     data class SelectStyle(val styleId: String) : MainUIEvent()
-    data class GenerateImage(val uri: String?) : MainUIEvent()
-    object ClearError : MainUIEvent()
-    object ToggleStyleSelector : MainUIEvent()
-    object ClearGeneratedImage : MainUIEvent()
-    object NavigateToPickPhoto : MainUIEvent()
-    data class SetSelectedImage(val image: DeviceImage) : MainUIEvent()
+    data object ToggleStyleSelector : MainUIEvent()
+    data class GenerateImage(
+        val uri: String?,
+        val onImageGenerated: (String) -> Unit
+    ) : MainUIEvent()
+    data object ClearGeneratedImage : MainUIEvent()
 }

@@ -11,7 +11,7 @@ import com.example.ninhdt_btvn.ui.navigation.MainRoute
 fun NavController.navigateToMain(navOptions: NavOptions) = navigate(route = MainRoute.route, navOptions)
 
 fun NavGraphBuilder.mainScreen(
-    imageUri: String? = null,
+    onImageGenerated: (String) -> Unit = {},
     onGenerate: () -> Unit = {},
 ) {
     composable(route = MainRoute.route) {
@@ -25,7 +25,11 @@ fun NavGraphBuilder.mainScreen(
             imageUri = selectedImageUri.value,
             onGenerate = {
                 onGenerate()
+            },
+            onImageSelected = { uri ->
+                onImageGenerated(uri)
             }
+
         )
     }
 }

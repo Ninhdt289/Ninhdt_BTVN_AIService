@@ -1,4 +1,7 @@
 package com.example.ninhdt_btvn.ui.screen.result
 
-class ResultUiState {
-}
+data class ResultUiState(
+    val imageUrl: String? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
