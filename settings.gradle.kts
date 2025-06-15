@@ -10,6 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven { url = uri("https://jitpack.io") }
+
     }
 }
 dependencyResolutionManagement {
@@ -17,6 +18,17 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://artifact.bytedance.com/repository/pangle")
+        }
+        maven {
+            credentials {
+                username ="software-inhouse"
+                password ="apero@123"
+            }
+            url = uri("https://artifactory.apero.vn/artifactory/gradle-release/")
+
+        }
     }
 }
 

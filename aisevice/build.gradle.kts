@@ -13,10 +13,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("key/release.jks")
+            storePassword = "trustedapp@123"
+            keyAlias = "release"
+            keyPassword = "trustedapp@123"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -30,9 +38,12 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+
 }
 
 dependencies {
+    implementation ("apero:api-signature:2.1.0-alpha04")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.0")
