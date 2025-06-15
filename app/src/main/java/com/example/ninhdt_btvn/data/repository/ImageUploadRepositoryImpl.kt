@@ -17,7 +17,7 @@ class ImageUploadRepositoryImpl(
         Log.d("ImageUploadRepositoryImpl", "uploadImage: $imageUri")
         return try {
             val presignedUrlResponse = ApiClient.genApi.getPresignedUrl()
-            
+            Log.d("ImageUploadRepositoryImpl", "uploadImage: $presignedUrlResponse")
             val inputStream = context.contentResolver.openInputStream(imageUri)
             val tempFile = File.createTempFile("upload_", ".jpg", context.cacheDir)
             FileOutputStream(tempFile).use { outputStream ->
@@ -33,7 +33,9 @@ class ImageUploadRepositoryImpl(
             ).execute()
             
             if (response.isSuccessful) {
+                Log.d("ImageUploadRepositoryImpl", "uploadImage: ${presignedUrlResponse.data.path}")
                 Result.success(presignedUrlResponse.data.path)
+
             } else {
                 Result.failure(Exception("Failed to upload image: ${response.code}"))
             }

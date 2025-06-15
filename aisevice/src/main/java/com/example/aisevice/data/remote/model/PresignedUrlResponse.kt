@@ -1,13 +1,15 @@
 package com.example.aisevice.data.remote.model
 
+import com.google.gson.annotations.SerializedName
+
 data class PresignedUrlResponse(
-    val statusCode: Int,
-    val message: String,
-    val data: PresignedUrlData,
-    val timestamp: Long
+    @SerializedName("statusCode") val statusCode: Int,
+    @SerializedName("message") val message: String,
+    @SerializedName("data") val data: PresignedUrlData,
+    @SerializedName("timestamp") val timestamp: Long
 )
 
 data class PresignedUrlData(
-    val url: String,
-    val path: String
+    @SerializedName("url") val url: String,
+    @SerializedName("path") val path: String
 ) 

@@ -5,7 +5,7 @@ import com.example.aisevice.data.remote.model.PresignedUrlResponse
 import com.example.aisevice.data.remote.model.StyleResponse
 import retrofit2.http.GET
 
-interface StyleAPI {
+interface StyleAPI : PushImageService{
     @GET("category?project=techtrek&segmentValue=IN&styleType=imageToImage&isApp=true")
     suspend fun getStyles(): BaseResponse<StyleResponse>
 
