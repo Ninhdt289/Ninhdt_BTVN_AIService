@@ -20,16 +20,18 @@ data class MainUIState(
 
     val isGenerating: Boolean = false,
 
-    val errorMessage: String? = null,
+    val errorMessage: String? = "abc",
 
     val showStyleSelector: Boolean = false,
 
-    val selectedImage: DeviceImage? = null
+    val selectedImage: DeviceImage? = null,
+
+    val imageUrl: String? = null
 )
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
     data class SelectStyle(val styleId: String) : MainUIEvent()
-    object GenerateImage : MainUIEvent()
+    data class GenerateImage(val uri: String?) : MainUIEvent()
     object ClearError : MainUIEvent()
     object ToggleStyleSelector : MainUIEvent()
     object ClearGeneratedImage : MainUIEvent()

@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +37,6 @@ import com.example.aisevice.data.remote.model.StyleItem
 import com.example.aisevice.data.remote.model.ThumbnailItem
 import com.example.aisevice.data.remote.model.ThumbnailUrls
 import com.example.ninhdt_btvn.utils.PermissionUtils
-import kotlinx.coroutines.flow.update
 
 @Composable
 fun MainScreen(
@@ -55,6 +55,7 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         Log.d("MainScreen", "LaunchedEffect triggered ${imageUri}")
     }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -68,26 +69,44 @@ fun MainScreen(
         )
 
         PhotoUploadArea(
-            onChangeImage = {  viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+            onChangeImage = {  
+                viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
                 if (PermissionUtils.hasImagePermissions(context)) {
                     onGenerate()
                 } else {
                     permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
-                }},
+                }
+            },
             selectedImage = imageUri
         )
 
         when {
-            state.isGenerating -> Text("Loading styles...")
-
-            state.errorMessage != null -> Text("Error: ${state.errorMessage}")
-
+            state.isGenerating -> {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFFE400D9)
+                    )
+                }
+            }
+            state.errorMessage != null -> {
+                Text(
+                    text = state.errorMessage?: "",
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
             !state.availableStyles.isNullOrEmpty() -> {
                 StyleSelectionSection(
                     styleList = state.availableStyles,
                     selectedStyle = state.selectedStyle,
                     onStyleSelected = { style ->
-                        viewModel._uiState.update { it.copy(selectedStyle = style) }
+                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
                     }
                 )
             }
@@ -95,9 +114,10 @@ fun MainScreen(
 
         Spacer(modifier = Modifier.weight(1f))
         GenerateButton(
-            onClick = {
-
-            }
+            onClick = { Log.d("GenerateButton", "Button clicked")
+                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri))
+            },
+            enabled = !state.isGenerating && state.selectedImage != null
         )
         Spacer(modifier = Modifier.height(50.dp))
     }
@@ -182,14 +202,17 @@ fun PhotoUploadArea(
                 color = Color.White,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable { onChangeImage() },
+            .clickable {
+               Log.d("PhotoUploadArea", "Clicked to change image")
+                onChangeImage() },
         contentAlignment = Alignment.Center
     ) {
         if (selectedImage != null) {
             AsyncImage(
                 model = selectedImage,
                 contentDescription = "Selected image",
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Fit
             )
@@ -372,10 +395,12 @@ fun UrlImageWithCoil(url: String) {
 
 @Composable
 fun GenerateButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Button(
-        onClick = onClick,
+        onClick = {
+            onClick()  },
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
@@ -389,9 +414,11 @@ fun GenerateButton(
                 shape = RoundedCornerShape(12.dp)
             ),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+       // enabled = enabled
     ) {
         Text(
             text = stringResource(R.string.main_button),
@@ -402,10 +429,6 @@ fun GenerateButton(
     }
 }
 
-/*data class StyleItem(
-    val name: String,
-    val imageResource: String
-)*/
 
 @Preview(showBackground = true)
 @Composable
