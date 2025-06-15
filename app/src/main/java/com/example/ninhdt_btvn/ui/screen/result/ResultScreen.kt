@@ -93,7 +93,7 @@ fun PhotoArea(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.45f)
+            .fillMaxHeight(0.5f)
             .border(
                 width = 2.dp,
                 color = Color(0xFFE400D9),

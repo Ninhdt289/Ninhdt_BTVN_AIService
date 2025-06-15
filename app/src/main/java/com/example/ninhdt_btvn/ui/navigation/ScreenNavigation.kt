@@ -9,16 +9,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ninhdt_btvn.ui.screen.main.mainScreen
 import com.example.ninhdt_btvn.ui.screen.pickphoto.navigation.pickPhotoScreen
 import com.example.ninhdt_btvn.ui.screen.result.navigation.resultScreen
-import org.koin.androidx.compose.koinViewModel
-import com.example.ninhdt_btvn.ui.screen.result.ResultViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun ScreenNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-
-
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -28,10 +26,10 @@ fun ScreenNavigation(
             onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
             onImageGenerated = { imageUrl ->
                 Log.d("ScreenNavigationninhdt22", "Image generated: $imageUrl")
-                navController.currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("result_image_uri", imageUrl)
-                navController.navigate(AiGenScreen.ResultScreen.route)
+                val encodedUrl = URLEncoder.encode(imageUrl, StandardCharsets.UTF_8.toString())
+                navController.navigate("${AiGenScreen.ResultScreen.route}/$encodedUrl") {
+                    popUpTo(AiGenScreen.MainScreen.route)
+                }
             }
         )
 

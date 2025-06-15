@@ -10,18 +10,17 @@ import androidx.navigation.compose.composable
 import com.example.ninhdt_btvn.ui.navigation.ResultRoute
 import com.example.ninhdt_btvn.ui.screen.result.ResultScreen
 
-fun NavController.navigateToResult(navOptions: NavOptions) = navigate(route = ResultRoute, navOptions)
+fun NavController.navigateToResult(imageUrl: String, navOptions: NavOptions) = 
+    navigate("${ResultRoute.route}/$imageUrl", navOptions)
 
 fun NavGraphBuilder.resultScreen(
     onBackClick: () -> Unit,
     onGenerateClick: () -> Unit
 ) {
-    composable(route = ResultRoute.route) {
-            backStackEntry ->
-        val imageUrl by backStackEntry
-            .savedStateHandle
-            .getLiveData<String>("result_image_uri")
-            .observeAsState()
+    composable(
+        route = "${ResultRoute.route}/{imageUrl}",
+    ) { backStackEntry ->
+        val imageUrl = backStackEntry.arguments?.getString("imageUrl")
         Log.d("ResultScreenninhdt22", "selectedImageUri: $imageUrl")
         ResultScreen(
             imageUrl = imageUrl,
