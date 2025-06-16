@@ -1,4 +1,4 @@
-package com.apero.aigenerate.network.model.segment
+package com.example.aisevice.data.remote.model.segment
 
 import com.google.gson.annotations.SerializedName
 
