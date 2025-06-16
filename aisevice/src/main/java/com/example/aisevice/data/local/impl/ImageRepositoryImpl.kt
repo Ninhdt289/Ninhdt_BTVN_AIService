@@ -2,12 +2,17 @@ package com.example.aisevice.data.local.impl
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.ContentValues
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.example.aisevice.data.local.model.DeviceImage
 import com.example.aisevice.data.local.repository.ImageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.URL
 
 class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageRepository {
     override suspend fun getDeviceImages(offset: Int, limit: Int): List<DeviceImage> = withContext(Dispatchers.IO) {
@@ -91,5 +96,35 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
             Log.e("ImageRepository", "Error getting image count", e)
         }
         return@withContext count
+    }
+
+    override suspend fun downloadImage(imageUrl: String, fileName: String): Uri? = withContext(Dispatchers.IO) {
+        try {
+            val url = URL(imageUrl)
+            val connection = url.openConnection()
+            connection.connect()
+            val inputStream: InputStream = connection.getInputStream()
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/AIDownloads")
+            }
+
+            val uri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+            uri?.let { imageUri ->
+                val outputStream: OutputStream? = contentResolver.openOutputStream(imageUri)
+                outputStream?.use { os ->
+                    inputStream.copyTo(os)
+                }
+                return@withContext imageUri
+            }
+        } catch (e: Exception) {
+            Log.e("ImageRepositoryImpl", "Error downloading image: $e", e)
+        }
+        return@withContext null
     }
 }

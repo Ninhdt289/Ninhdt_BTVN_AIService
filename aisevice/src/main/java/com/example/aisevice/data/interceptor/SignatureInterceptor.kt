@@ -1,8 +1,7 @@
-package com.apero.beauty_full.utils.data.network.interceptor
+package com.example.aisevice.data.interceptor
 
 
 import com.apero.signature.SignatureParser
-import com.example.aisevice.data.interceptor.TimeStampManage
 import okhttp3.Interceptor
 import okhttp3.Response
 

@@ -7,9 +7,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.example.ninhdt_btvn.ui.navigation.MainRoute
 
-
-fun NavController.navigateToMain(navOptions: NavOptions) = navigate(route = MainRoute.route, navOptions)
-
 fun NavGraphBuilder.mainScreen(
     onImageGenerated: (String) -> Unit = {},
     onGenerate: () -> Unit = {},

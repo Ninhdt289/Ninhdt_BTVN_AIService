@@ -17,6 +17,11 @@ class PickPhotoViewModel(
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
 
     private val pageSize = 50
+   /* init {
+        viewModelScope.launch {
+          // val totalImages = imageRepository.getTotalImageCount()
+        }
+    }*/
 
     fun loadImages(loadMore: Boolean = false) {
         if (_uiState.value.isLoading || (!loadMore && !_uiState.value.hasMoreImages)) return

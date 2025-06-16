@@ -34,7 +34,6 @@ fun PickPhotoScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val lazyGridState = rememberLazyGridState()
-    val coroutineScope = rememberCoroutineScope()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -52,7 +51,6 @@ fun PickPhotoScreen(
         }
     }
 
-    // Handle lazy loading
     LaunchedEffect(lazyGridState) {
         snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()

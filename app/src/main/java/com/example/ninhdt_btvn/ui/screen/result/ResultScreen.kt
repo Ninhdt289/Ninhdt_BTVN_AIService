@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,10 +34,13 @@ fun ResultScreen(
     modifier: Modifier = Modifier,
     imageUrl: String? = null,
     onBackClick: () -> Unit = {},
-    onGenerateClick: () -> Unit = {},
     viewModel: ResultViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(imageUrl) {
+        viewModel.updateImageUrl(imageUrl)
+    }
 
     Scaffold(
         topBar = {
@@ -61,24 +65,34 @@ fun ResultScreen(
             ) {
                 Spacer(modifier = Modifier.weight(0.5f))
                 PhotoArea(
-                    imageUrl = imageUrl,
-                    isLoading = state.isLoading
+                    imageUrl = state.imageUrl,
+                    isLoading = state.isLoading || state.isDownloading
                 )
                 if (state.errorMessage != null) {
                     Text(
-                        text = state.errorMessage?:"",
+                        text = state.errorMessage ?: "",
                         color = Color.Red,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
+                } else if (state.isDownloading) {
+                    Text(
+                        text = "Downloading image...",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        textAlign = TextAlign.Center,
+                        color = Color.Gray
+                    )
                 }
                 Spacer(modifier = Modifier.weight(0.5f))
-                GenerateButton(
-                    onClick = onGenerateClick,
-                    enabled = !state.isLoading
+                DownloadButton(
+                    onClick = { viewModel.downloadImage() },
+                    enabled = !state.isLoading && !state.isDownloading && state.imageUrl != null
                 )
+
                 Spacer(modifier = Modifier.height(50.dp))
             }
         }
@@ -133,7 +147,7 @@ fun PhotoArea(
 }
 
 @Composable
-fun GenerateButton(
+fun DownloadButton(
     onClick: () -> Unit,
     enabled: Boolean = true
 ) {
@@ -166,6 +180,7 @@ fun GenerateButton(
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

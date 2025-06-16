@@ -1,6 +1,5 @@
 package com.example.ninhdt_btvn.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -25,7 +24,6 @@ fun ScreenNavigation(
         mainScreen(
             onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
             onImageGenerated = { imageUrl ->
-                Log.d("ScreenNavigationninhdt22", "Image generated: $imageUrl")
                 val encodedUrl = URLEncoder.encode(imageUrl, StandardCharsets.UTF_8.toString())
                 navController.navigate("${AiGenScreen.ResultScreen.route}/$encodedUrl") {
                     popUpTo(AiGenScreen.MainScreen.route)
@@ -45,7 +43,6 @@ fun ScreenNavigation(
 
         resultScreen(
             onBackClick = { navController.popBackStack() },
-            onGenerateClick = { navController.navigate(AiGenScreen.MainScreen.route) }
         )
     }
 }

@@ -1,13 +1,11 @@
 package com.example.aisevice.data.client
 
-import com.apero.beauty_full.utils.data.network.interceptor.SignatureInterceptor
 import com.example.aisevice.data.remote.request.StyleAPI
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
