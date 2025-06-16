@@ -82,6 +82,15 @@ fun MainScreen(
         )
 
         when {
+            !state.availableStyles.isNullOrEmpty() -> {
+                StyleSelectionSection(
+                    styleList = state.availableStyles,
+                    selectedStyle = state.selectedStyle,
+                    onStyleSelected = { style ->
+                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
+                    }
+                )
+            }
             state.isGenerating -> {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -102,15 +111,7 @@ fun MainScreen(
                     textAlign = TextAlign.Center
                 )
             }
-            !state.availableStyles.isNullOrEmpty() -> {
-                StyleSelectionSection(
-                    styleList = state.availableStyles,
-                    selectedStyle = state.selectedStyle,
-                    onStyleSelected = { style ->
-                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
-                    }
-                )
-            }
+
         }
 
         Spacer(modifier = Modifier.weight(1f))

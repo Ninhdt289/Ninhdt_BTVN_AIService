@@ -35,14 +35,6 @@ val aiArtModule = module {
             .build()
             .create(StyleAPI::class.java)
     }
- /*   single<PushImageService> {
-        Retrofit.Builder()
-            .baseUrl("https://api-img-gen-wrapper.apero.vn/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(PushImageService::class.java)
-    }*/
-
     single { StyleRepositoryImpl() } bind StyleRepository::class
     single { ImageRepositoryImpl(androidContext().contentResolver) } bind ImageRepository::class
 }

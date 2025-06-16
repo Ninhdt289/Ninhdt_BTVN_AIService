@@ -1,5 +1,6 @@
 package com.example.aisevice.data.local.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 
 data class DeviceImage(
@@ -8,5 +9,6 @@ data class DeviceImage(
     val displayName: String,
     val dateAdded: Long,
     val size: Long,
-    val mimeType: String
+    val mimeType: String,
+    val bitmap: Bitmap? = null
 )

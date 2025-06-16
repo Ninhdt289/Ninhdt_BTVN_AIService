@@ -3,6 +3,8 @@ package com.example.aisevice.data.local.impl
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
@@ -58,6 +60,26 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                             id
                         )
 
+                        val bitmap = try {
+                            contentResolver.openInputStream(contentUri)?.use { inputStream ->
+                                val options = BitmapFactory.Options().apply {
+                                    inJustDecodeBounds = true
+                                }
+                                BitmapFactory.decodeStream(inputStream, null, options)
+                                
+                                val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, 200, 200)
+                                
+                                contentResolver.openInputStream(contentUri)?.use { newStream ->
+                                    options.inJustDecodeBounds = false
+                                    options.inSampleSize = sampleSize
+                                    BitmapFactory.decodeStream(newStream, null, options)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("ImageRepository", "Error loading bitmap for image $id", e)
+                            null
+                        }
+
                         images.add(
                             DeviceImage(
                                 id = id,
@@ -65,7 +87,8 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                                 displayName = displayName,
                                 dateAdded = dateAdded,
                                 size = size,
-                                mimeType = mimeType
+                                mimeType = mimeType,
+                                bitmap = bitmap
                             )
                         )
                         count++
@@ -77,6 +100,18 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
         }
 
         return@withContext images
+    }
+
+    private fun calculateSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
+        var sampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+            while ((halfHeight / sampleSize) >= reqHeight && (halfWidth / sampleSize) >= reqWidth) {
+                sampleSize *= 2
+            }
+        }
+        return sampleSize
     }
 
     override suspend fun getTotalImageCount(): Int = withContext(Dispatchers.IO) {

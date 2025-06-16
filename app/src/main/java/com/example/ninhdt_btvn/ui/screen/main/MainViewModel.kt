@@ -64,7 +64,6 @@ class MainViewModel(
                 _uiState.update { it.copy(errorMessage = null) }
             }
             is MainUIEvent.NavigateToPickPhoto -> {
-                // Handle navigation to photo picker
             }
             is MainUIEvent.SetSelectedImage -> {
                 _uiState.update { it.copy(imageUrl = event.image) }

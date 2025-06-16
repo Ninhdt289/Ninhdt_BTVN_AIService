@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -40,16 +41,24 @@ fun DeviceImageItem(
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(image.uri)
-                    .crossfade(true)
-                    .size(200)
-                    .build(),
-                contentDescription = image.displayName,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+            if (image.bitmap != null) {
+                Image(
+                    bitmap = image.bitmap!!.asImageBitmap(),
+                    contentDescription = image.displayName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(image.uri)
+                        .size(200)
+                        .build(),
+                    contentDescription = image.displayName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             if (isSelected) {
                 Box(
@@ -74,7 +83,6 @@ fun DeviceImageItem(
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
-
                 }
             }
         }
