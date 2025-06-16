@@ -11,15 +11,10 @@ class StyleRepositoryImpl : StyleRepository {
     override suspend fun getStyles(): Result<BaseResponse<StyleResponse>> = withContext(Dispatchers.IO) {
         try {
             val response = com.example.aisevice.data.client.ApiClient.styleApi.getStyles()
-            val styles = response.data.items
-            Log.d(TAG, "Fetched ${styles.size} styles")
             Result.success(response)
         } catch (e: Exception) {
-            Log.e(TAG, "Error fetching styles: ${e.message}", e)
             Result.failure(e)
         }
     }
-    companion object {
-        private const val TAG = "StyleRepositoriiiii"
-    }
+
 }

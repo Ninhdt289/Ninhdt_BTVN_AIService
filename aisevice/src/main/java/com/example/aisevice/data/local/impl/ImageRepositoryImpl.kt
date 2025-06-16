@@ -44,7 +44,6 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                 val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
                 val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)
 
-                // Move to offset position
                 if (cursor.moveToPosition(offset)) {
                     var count = 0
                     do {
