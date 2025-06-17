@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ninhdt_btvn.R
+import com.example.ninhdt_btvn.ui.screen.main.component.LoadingDialog
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,67 +43,61 @@ fun ResultScreen(
         viewModel.updateImageUrl(imageUrl)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_result_back),
-                            contentDescription = "Back",
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_result_back),
+                                contentDescription = "Back",
+                            )
+                        }
+                    },
+                )
+            },
+            content = { paddingValues ->
+                Column(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                ) {
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    PhotoArea(
+                        imageUrl = state.imageUrl,
+                    )
+                    if (state.errorMessage != null) {
+                        Text(
+                            text = state.errorMessage ?: "",
+                            color = Color.Red,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            textAlign = TextAlign.Center
                         )
                     }
-                },
-            )
-        },
-        content = { paddingValues ->
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-            ) {
-                Spacer(modifier = Modifier.weight(0.5f))
-                PhotoArea(
-                    imageUrl = state.imageUrl,
-                    isLoading = state.isLoading || state.isDownloading
-                )
-                if (state.errorMessage != null) {
-                    Text(
-                        text = state.errorMessage ?: "",
-                        color = Color.Red,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        textAlign = TextAlign.Center
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    DownloadButton(
+                        onClick = { viewModel.downloadImage() },
+                        enabled = !state.isLoading && !state.isDownloading && state.imageUrl != null
                     )
-                } else if (state.isDownloading) {
-                    Text(
-                        text = "Downloading image...",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray
-                    )
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
-                Spacer(modifier = Modifier.weight(0.5f))
-                DownloadButton(
-                    onClick = { viewModel.downloadImage() },
-                    enabled = !state.isLoading && !state.isDownloading && state.imageUrl != null
-                )
-
-                Spacer(modifier = Modifier.height(50.dp))
             }
+        )
+
+        if (state.isDownloading) {
+            LoadingDialog(R.string.result_loading)
         }
-    )
+    }
 }
 
 @Composable
 fun PhotoArea(
     imageUrl: String?,
-    isLoading: Boolean
 ) {
     Box(
         modifier = Modifier
@@ -120,11 +115,6 @@ fun PhotoArea(
         contentAlignment = Alignment.Center
     ) {
         when {
-            isLoading -> {
-                CircularProgressIndicator(
-                    color = Color(0xFFE400D9)
-                )
-            }
             imageUrl != null -> {
                 AsyncImage(
                     model = imageUrl,
