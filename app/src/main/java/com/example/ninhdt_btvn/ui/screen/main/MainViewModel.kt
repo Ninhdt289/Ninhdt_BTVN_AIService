@@ -7,27 +7,57 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aisevice.data.remote.repository.StyleRepository
 import com.example.ninhdt_btvn.data.repository.ImageUploadRepository
+import com.example.ninhdt_btvn.ui.shared.SharedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.aisevice.data.remote.request.AiArtRequest
+import com.example.aisevice.data.local.repository.ImageRepository
 
 class MainViewModel(
     private val repository: StyleRepository,
-    private val imageUploadRepository: ImageUploadRepository
+    private val imageUploadRepository: ImageUploadRepository,
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
+    private val pageSize = 50
+
     init {
         getListStyle()
+        loadImages()
+    }
+
+    private fun loadImages() {
+        if (SharedState.isLoading || (!SharedState.hasMoreImages)) return
+
+        viewModelScope.launch {
+            SharedState.isLoading = true
+            try {
+                val currentPage = SharedState.currentPage
+                val offset = currentPage * pageSize
+                
+                val images = imageRepository.getDeviceImages(offset, pageSize)
+                val totalImages = imageRepository.getTotalImageCount()
+                
+                SharedState.apply {
+                    this.images = if (currentPage == 0) images else this.images + images
+                    this.isLoading = false
+                    this.currentPage = currentPage
+                    this.totalImages = totalImages
+                    this.hasMoreImages = (offset + images.size) < totalImages
+                }
+            } catch (e: Exception) {
+                SharedState.isLoading = false
+            }
+        }
     }
 
     private fun getListStyle() {
         viewModelScope.launch {
-
             val result = repository.getStyles()
 
             result
@@ -61,6 +91,7 @@ class MainViewModel(
                 _uiState.update { it.copy(errorMessage = null) }
             }
             is MainUIEvent.NavigateToPickPhoto -> {
+                // No need to load images here since we load them in init
             }
             is MainUIEvent.SetSelectedImage -> {
                 _uiState.update { it.copy(imageUrl = event.image) }
