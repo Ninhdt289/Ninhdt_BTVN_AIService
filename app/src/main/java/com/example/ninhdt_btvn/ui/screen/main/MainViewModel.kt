@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.example.aisevice.data.remote.model.ResponseState
-import java.io.File
 import com.example.aisevice.data.remote.request.AiArtRequest
 
 class MainViewModel(
@@ -29,7 +27,6 @@ class MainViewModel(
 
     private fun getListStyle() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isGenerating = true) }
 
             val result = repository.getStyles()
 

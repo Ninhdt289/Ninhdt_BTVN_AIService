@@ -37,6 +37,18 @@ import com.example.aisevice.data.remote.model.StyleItem
 import com.example.aisevice.data.remote.model.ThumbnailItem
 import com.example.aisevice.data.remote.model.ThumbnailUrls
 import com.example.ninhdt_btvn.utils.PermissionUtils
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.AlertDialog
+import com.airbnb.lottie.compose.*
+import com.example.ninhdt_btvn.ui.screen.main.component.GenerateButton
+import com.example.ninhdt_btvn.ui.screen.main.component.LoadingDialog
+import com.example.ninhdt_btvn.ui.screen.main.component.PhotoUploadArea
+import com.example.ninhdt_btvn.ui.screen.main.component.PromptInputField
+import com.example.ninhdt_btvn.ui.screen.main.component.StyleItemCard
+import com.example.ninhdt_btvn.ui.screen.main.component.StyleList
+import com.example.ninhdt_btvn.ui.screen.main.component.StyleSelectionSection
+import com.example.ninhdt_btvn.ui.screen.main.component.StyleTabsWithContent
+
 
 @Composable
 fun MainScreen(
@@ -54,381 +66,61 @@ fun MainScreen(
     )
 
     LaunchedEffect(Unit) {
-        Log.d("MainScreen", "LaunchedEffect triggered ${imageUri}")
+        Log.d("MainScreen", "LaunchedEffect triggered $imageUri")
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        PromptInputField(
-            value = state.promptText,
-            onValueChange = { viewModel.onEvent(MainUIEvent.UpdatePromptText(it)) },
-            onClearClick = { viewModel.onEvent(MainUIEvent.UpdatePromptText("")) }
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PromptInputField(
+                value = state.promptText,
+                onValueChange = { viewModel.onEvent(MainUIEvent.UpdatePromptText(it)) },
+                onClearClick = { viewModel.onEvent(MainUIEvent.UpdatePromptText("")) }
+            )
 
-        PhotoUploadArea(
-            onChangeImage = {  
-                viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
-                if (PermissionUtils.hasImagePermissions(context)) {
-                    onOpenPickPhoto()
-                } else {
-                    permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
-                }
-            },
-            selectedImage = imageUri
-        )
-
-        when {
-            !state.availableStyles.isNullOrEmpty() -> {
-                StyleSelectionSection(
-                    styleList = state.availableStyles,
-                    selectedStyle = state.selectedStyle,
-                    onStyleSelected = { style ->
-                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
+            PhotoUploadArea(
+                onChangeImage = {  
+                    viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+                    if (PermissionUtils.hasImagePermissions(context)) {
+                        onOpenPickPhoto()
+                    } else {
+                        permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
                     }
-                )
-            }
-            state.isGenerating -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Color(0xFFE400D9)
+                },
+                selectedImage = imageUri
+            )
+
+            when {
+                !state.availableStyles.isNullOrEmpty() -> {
+                    StyleSelectionSection(
+                        styleList = state.availableStyles,
+                        selectedStyle = state.selectedStyle,
+                        onStyleSelected = { style ->
+                            viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
+                        }
                     )
                 }
-            }
-            state.errorMessage != null -> {
-                Text(
-                    text = state.errorMessage?: "",
-                    color = Color.Red,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    textAlign = TextAlign.Center
-                )
+
             }
 
+            Spacer(modifier = Modifier.weight(1f))
+
+            GenerateButton(
+                onClick = { Log.d("GenerateButton", "Button clicked")
+                    viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected),context)
+                },
+                enabled = !state.isGenerating && state.selectedImage != null
+            )
+            Spacer(modifier = Modifier.height(50.dp))
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-        val context = LocalContext.current
-        GenerateButton(
-            onClick = { Log.d("GenerateButton", "Button clicked")
-                viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected),context)
-            },
-            enabled = !state.isGenerating && state.selectedImage != null
-        )
-        Spacer(modifier = Modifier.height(50.dp))
-    }
-}
-
-@Composable
-fun PromptInputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    onClearClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .border(
-                width = 2.dp,
-                color = Color(0xFFE400D9),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.main_edittext_hint),
-                            color = Color.Gray,
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
-                }
-            )
+        if (state.isGenerating) {
+            LoadingDialog(R.string.main_loading)
         }
-
-        Image(
-            painter = painterResource(id = R.drawable.ic_main_delete),
-            contentDescription = "Clear text",
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(24.dp)
-                .clickable { onClearClick() }
-                .padding(4.dp),
-            contentScale = ContentScale.Fit
-        )
-    }
-}
-
-@Composable
-fun PhotoUploadArea(
-    onChangeImage: () -> Unit,
-    selectedImage: String? = null
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f)
-            .border(
-                width = 2.dp,
-                color = Color(0xFFE400D9),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .clickable {
-               Log.d("PhotoUploadArea", "Clicked to change image")
-                onChangeImage() },
-        contentAlignment = Alignment.Center
-    ) {
-        if (selectedImage != null) {
-            AsyncImage(
-                model = selectedImage,
-                contentDescription = "Selected image",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Fit
-            )
-            
-            Image(
-                painter = painterResource(id = R.drawable.ic_main_change_image),
-                contentDescription = "Change image",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .size(50.dp)
-                    .clickable { onChangeImage() }
-                    .padding(top = 15.dp, start = 19.dp),
-                contentScale = ContentScale.Fit
-            )
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_main_image),
-                    contentDescription = "Add photo",
-                    modifier = Modifier.size(80.dp),
-                )
-
-                Text(
-                    text = stringResource(R.string.main_image_title),
-                    color = Color.Gray,
-                    fontSize = 16.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StyleItemCard(
-    styleItem: StyleItem,
-    isSelected: Boolean = false,
-    onSelect: (StyleItem) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .border(
-                    width = if (isSelected) 2.dp else 0.dp,
-                    color = Color(0xFFE400D9),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .clickable { onSelect(styleItem) }
-        ) {
-            UrlImageWithCoil(styleItem.key)
-        }
-
-        Text(
-            text = styleItem.name,
-            fontSize = 12.sp,
-            color = if (isSelected) Color(0xFFE400D9) else Color.Black
-        )
-    }
-}
-
-@Composable
-fun StyleList(
-    styles: List<StyleItem>,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
-) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(styles) { styleItem ->
-            StyleItemCard(
-                styleItem = styleItem,
-                isSelected = styleItem == selectedStyle,
-                onSelect = onStyleSelected
-            )
-        }
-    }
-}
-
-@Composable
-fun StyleTabsWithContent(
-    styleList: List<StyleCategory>,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
-) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-
-    Column {
-        ScrollableTabRow(
-            selectedTabIndex = selectedTabIndex,
-            containerColor = Color.Transparent,
-            contentColor = Color(0xFFE400D9),
-            edgePadding = 2.dp,
-            indicator = { tabPositions ->
-                val currentTab = tabPositions[selectedTabIndex]
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.BottomStart)
-                        .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
-                        .width(16.dp)
-                        .height(2.dp)
-                        .background(Color(0xFFE400D9), shape = CircleShape)
-                )
-            },
-            divider = {}
-        ) {
-            styleList.forEachIndexed { index, category ->
-                Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = {
-                        Text(
-                            text = category.name,
-                            fontSize = 14.sp,
-                            fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
-                            color = if (selectedTabIndex == index) Color(0xFFE400D9) else Color.Gray,
-                            maxLines = 1,
-                        )
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        StyleList(
-            styles = styleList[selectedTabIndex].styles,
-            selectedStyle = selectedStyle,
-            onStyleSelected = onStyleSelected
-        )
-    }
-}
-
-@Composable
-fun StyleSelectionSection(
-    styleList: List<StyleCategory>?,
-    selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.main_style_title),
-            color = Color(0xFFE400D9),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        if (!styleList.isNullOrEmpty()) {
-            StyleTabsWithContent(
-                styleList = styleList,
-                selectedStyle = selectedStyle,
-                onStyleSelected = onStyleSelected
-            )
-        }
-    }
-}
-
-@Composable
-fun UrlImageWithCoil(url: String) {
-    AsyncImage(
-        model = url,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(8.dp))
-    )
-}
-
-@Composable
-fun GenerateButton(
-    onClick: () -> Unit,
-    enabled: Boolean = true
-) {
-    Button(
-        onClick = {
-            onClick()  },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color(0xFFE400D9),
-                        Color(0xFF1D00F5)
-                    )
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
-        ),
-        shape = RoundedCornerShape(16.dp),
-       // enabled = enabled
-    ) {
-        Text(
-            text = stringResource(R.string.main_button),
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 
@@ -442,6 +134,13 @@ fun PromptInputFieldPreview() {
         onClearClick = {}
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+fun DialogPreview() {
+    LoadingDialog(R.string.main_loading)
+}
+
 
 @Preview(showBackground = true)
 @Composable

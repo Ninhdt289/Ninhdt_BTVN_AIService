@@ -1,0 +1,188 @@
+package com.example.ninhdt_btvn.ui.screen.main.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.aisevice.data.remote.model.StyleCategory
+import com.example.aisevice.data.remote.model.StyleItem
+import com.example.ninhdt_btvn.R
+
+
+@Composable
+fun StyleItemCard(
+    styleItem: StyleItem,
+    isSelected: Boolean = false,
+    onSelect: (StyleItem) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(
+                    width = if (isSelected) 2.dp else 0.dp,
+                    color = Color(0xFFE400D9),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .clickable { onSelect(styleItem) }
+        ) {
+            UrlImageWithCoil(styleItem.key)
+        }
+
+        Text(
+            text = styleItem.name,
+            fontSize = 12.sp,
+            color = if (isSelected) Color(0xFFE400D9) else Color.Black
+        )
+    }
+}
+
+@Composable
+fun StyleList(
+    styles: List<StyleItem>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(styles) { styleItem ->
+            StyleItemCard(
+                styleItem = styleItem,
+                isSelected = styleItem == selectedStyle,
+                onSelect = onStyleSelected
+            )
+        }
+    }
+}
+
+@Composable
+fun StyleTabsWithContent(
+    styleList: List<StyleCategory>,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+
+    Column {
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            contentColor = Color(0xFFE400D9),
+            edgePadding = 2.dp,
+            indicator = { tabPositions ->
+                val currentTab = tabPositions[selectedTabIndex]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.BottomStart)
+                        .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
+                        .width(16.dp)
+                        .height(2.dp)
+                        .background(Color(0xFFE400D9), shape = CircleShape)
+                )
+            },
+            divider = {}
+        ) {
+            styleList.forEachIndexed { index, category ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = {
+                        Text(
+                            text = category.name,
+                            fontSize = 14.sp,
+                            fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTabIndex == index) Color(0xFFE400D9) else Color.Gray,
+                            maxLines = 1,
+                        )
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        StyleList(
+            styles = styleList[selectedTabIndex].styles,
+            selectedStyle = selectedStyle,
+            onStyleSelected = onStyleSelected
+        )
+    }
+}
+
+@Composable
+fun StyleSelectionSection(
+    styleList: List<StyleCategory>?,
+    selectedStyle: StyleItem?,
+    onStyleSelected: (StyleItem) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.main_style_title),
+            color = Color(0xFFE400D9),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        if (!styleList.isNullOrEmpty()) {
+            StyleTabsWithContent(
+                styleList = styleList,
+                selectedStyle = selectedStyle,
+                onStyleSelected = onStyleSelected
+            )
+        }
+    }
+}
+
+@Composable
+fun UrlImageWithCoil(url: String) {
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(100.dp)
+            .clip(RoundedCornerShape(8.dp))
+    )
+}

@@ -1,9 +1,10 @@
-package com.example.ninhdt_btvn.ui.screen.main
+package com.example.ninhdt_btvn.ui.screen.main.navigation
 
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.ninhdt_btvn.ui.navigation.MainRoute
+import com.example.ninhdt_btvn.ui.screen.main.MainScreen
 
 fun NavGraphBuilder.mainScreen(
     onImageGenerated: (String) -> Unit = {},

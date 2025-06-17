@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.ninhdt_btvn.ui.screen.main.mainScreen
+import com.example.ninhdt_btvn.ui.screen.main.navigation.mainScreen
 import com.example.ninhdt_btvn.ui.screen.pickphoto.navigation.pickPhotoScreen
 import com.example.ninhdt_btvn.ui.screen.result.navigation.resultScreen
 import java.net.URLEncoder
