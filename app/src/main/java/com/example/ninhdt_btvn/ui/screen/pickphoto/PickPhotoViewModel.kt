@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aisevice.data.local.model.DeviceImage
@@ -18,7 +19,6 @@ class PickPhotoViewModel(
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
 
     init {
-        // Use images from SharedState
         _uiState.value = _uiState.value.copy(
             images = SharedState.images,
             hasPermission = SharedState.hasPermission,
@@ -26,6 +26,11 @@ class PickPhotoViewModel(
             totalImages = SharedState.totalImages,
             hasMoreImages = SharedState.hasMoreImages
         )
+
+        Log.d("PickPhotoViewModel", "init shared state: ${SharedState.hasMoreImages}")
+        Log.d("PickPhotoViewModel", "init shared totalImages: ${SharedState.totalImages}")
+        Log.d("PickPhotoViewModel", "init shared lastLoadedOffset: ${SharedState.lastLoadedOffset}")
+        Log.d("PickPhotoViewModel", "init shared lastLoadedLimit: ${SharedState.lastLoadedLimit}")
     }
 
     fun loadImages(loadMore: Boolean = false) {
@@ -34,17 +39,20 @@ class PickPhotoViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                val currentPage = if (loadMore) _uiState.value.currentPage + 1 else 0
-                val offset = currentPage * 50
+                val offset = if (loadMore) {
+                    SharedState.lastLoadedOffset
+                } else {
+                    0
+                }
                 
-                val images = imageRepository.getDeviceImages(offset, 50)
+                Log.d("PickPhotoViewModel", "Loading images with offset: $offset, limit: ${SharedState.lastLoadedLimit}")
+                val images = imageRepository.getDeviceImages(offset, SharedState.lastLoadedLimit)
                 val totalImages = imageRepository.getTotalImageCount()
                 
-                // Update both local state and shared state
                 _uiState.value = _uiState.value.copy(
-                    images = if (loadMore) _uiState.value.images + images else images,
+                    images = if (loadMore) SharedState.images + images else images,
                     isLoading = false,
-                    currentPage = currentPage,
+                    currentPage = offset / SharedState.lastLoadedLimit,
                     totalImages = totalImages,
                     hasMoreImages = (offset + images.size) < totalImages
                 )
@@ -52,11 +60,15 @@ class PickPhotoViewModel(
                 SharedState.apply {
                     this.images = _uiState.value.images
                     this.isLoading = false
-                    this.currentPage = currentPage
+                    this.currentPage = _uiState.value.currentPage
                     this.totalImages = totalImages
                     this.hasMoreImages = (offset + images.size) < totalImages
+                    this.lastLoadedOffset = offset + SharedState.lastLoadedLimit
                 }
+                
+                Log.d("PickPhotoViewModel", "Loaded ${images.size} images. New offset: ${SharedState.lastLoadedOffset}")
             } catch (e: Exception) {
+                Log.e("PickPhotoViewModel", "Error loading images", e)
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 SharedState.isLoading = false
             }
@@ -74,12 +86,9 @@ class PickPhotoViewModel(
     fun setPermissionGranted(granted: Boolean) {
         SharedState.hasPermission = granted
         _uiState.value = _uiState.value.copy(hasPermission = granted)
-        if (granted) {
+        if (granted && SharedState.lastLoadedOffset == 0) {
             loadImages()
         }
     }
 
-    fun clearSelection() {
-        _uiState.value = _uiState.value.copy(selectedImage = null)
-    }
 }

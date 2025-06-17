@@ -24,7 +24,7 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
-    private val pageSize = 50
+    private val pageSize = 100
 
     init {
         getListStyle()
@@ -39,16 +39,18 @@ class MainViewModel(
             try {
                 val currentPage = SharedState.currentPage
                 val offset = currentPage * pageSize
-                
+
                 val images = imageRepository.getDeviceImages(offset, pageSize)
                 val totalImages = imageRepository.getTotalImageCount()
-                
+
                 SharedState.apply {
                     this.images = if (currentPage == 0) images else this.images + images
                     this.isLoading = false
                     this.currentPage = currentPage
                     this.totalImages = totalImages
                     this.hasMoreImages = (offset + images.size) < totalImages
+                    this.lastLoadedOffset = offset + pageSize
+                    this.lastLoadedLimit = pageSize
                 }
             } catch (e: Exception) {
                 SharedState.isLoading = false
@@ -87,25 +89,31 @@ class MainViewModel(
             is MainUIEvent.UpdatePromptText -> {
                 _uiState.update { it.copy(promptText = event.text) }
             }
+
             MainUIEvent.ClearError -> {
                 _uiState.update { it.copy(errorMessage = null) }
             }
+
             is MainUIEvent.NavigateToPickPhoto -> {
-                // No need to load images here since we load them in init
             }
+
             is MainUIEvent.SetSelectedImage -> {
                 _uiState.update { it.copy(imageUrl = event.image) }
             }
+
             is MainUIEvent.SelectStyle -> {
                 selectStyle(event.styleId)
             }
+
             MainUIEvent.ToggleStyleSelector -> {
                 _uiState.update { it.copy(showStyleSelector = !it.showStyleSelector) }
             }
+
             is MainUIEvent.GenerateImage -> {
                 Log.d("GenerateImage", "Generating image with prompt: ${_uiState.value.promptText}")
                 generateImage(context!!, event.uri, event.onImageGenerated)
             }
+
             MainUIEvent.ClearGeneratedImage -> {
                 _uiState.update { it.copy(generatedImage = null) }
             }
@@ -114,7 +122,8 @@ class MainViewModel(
 
     private fun selectStyle(styleId: String) {
         _uiState.update { state ->
-            val selectedStyle = state.availableStyles?.flatMap { it.styles }?.find { it.id == styleId }
+            val selectedStyle =
+                state.availableStyles?.flatMap { it.styles }?.find { it.id == styleId }
             state.copy(
                 selectedStyle = selectedStyle,
                 selectedStyleId = styleId
@@ -145,7 +154,10 @@ class MainViewModel(
 
             imageUploadRepository.uploadImage(Uri.parse(selectedImage))
                 .onSuccess { uploadedPath ->
-                    Log.d("GenerateImage", "Upload thành công. Path trên cloud: $uploadedPath. Bắt đầu gen AI art...")
+                    Log.d(
+                        "GenerateImage",
+                        "Upload thành công. Path trên cloud: $uploadedPath. Bắt đầu gen AI art..."
+                    )
 
                     val request = AiArtRequest(
                         file = uploadedPath,
@@ -157,7 +169,10 @@ class MainViewModel(
 
                     imageUploadRepository.generateArt(request)
                         .onSuccess { response ->
-                            Log.d("GenerateImage", "Gen AI art thành công: ${response.body()?.data?.url}")
+                            Log.d(
+                                "GenerateImage",
+                                "Gen AI art thành công: ${response.body()?.data?.url}"
+                            )
                             val imageUrl = response.body()?.data?.url ?: ""
                             _uiState.update {
                                 it.copy(
