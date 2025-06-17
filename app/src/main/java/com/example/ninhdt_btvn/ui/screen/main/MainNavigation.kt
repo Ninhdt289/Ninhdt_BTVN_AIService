@@ -1,15 +1,13 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.example.ninhdt_btvn.ui.navigation.MainRoute
 
 fun NavGraphBuilder.mainScreen(
     onImageGenerated: (String) -> Unit = {},
-    onGenerate: () -> Unit = {},
+    onOpenPickPhoto: () -> Unit = {},
 ) {
     composable(route = MainRoute.route) {
             backStackEntry ->
@@ -20,8 +18,8 @@ fun NavGraphBuilder.mainScreen(
 
         MainScreen(
             imageUri = selectedImageUri.value,
-            onGenerate = {
-                onGenerate()
+            onOpenPickPhoto = {
+                onOpenPickPhoto()
             },
             onImageSelected = { uri ->
                 onImageGenerated(uri)

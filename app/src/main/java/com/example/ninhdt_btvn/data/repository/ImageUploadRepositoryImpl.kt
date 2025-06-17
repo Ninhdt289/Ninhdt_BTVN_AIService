@@ -9,12 +9,11 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import com.example.aisevice.data.remote.request.AiArtRequest
-import com.example.aisevice.data.remote.model.BaseResponse
 import com.example.aisevice.data.remote.request.AiArtResponse
+import com.example.aisevice.data.remote.request.AIServiceApi
 
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.example.ninhdt_btvn.data.api.AIServiceApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -24,7 +23,6 @@ class ImageUploadRepositoryImpl(
 ): ImageUploadRepository, KoinComponent {
 
     private val aiServiceApi: AIServiceApi by inject()
-
     override suspend fun uploadImage(imageUri: Uri): Result<String> =  withContext(Dispatchers.IO) {
         Log.d("ImageUploadRepositoryImpl", "uploadImage: $imageUri")
         return@withContext try {
@@ -60,17 +58,14 @@ class ImageUploadRepositoryImpl(
     }
 
     override suspend fun generateArt(request: AiArtRequest): Result<Response<AiArtResponse>> {
-        Log.d("ImageUploadRepositoryImpl", "generateArt called with request: $request")
         return try {
            val response = aiServiceApi.generateAiArt(request)
             if (response.isSuccessful) {
-                Log.d("ImageUploadRepositoryImpl", "generateArt success. Response body: ${response.body()}")
-                response.body()?.let { body ->
+                response.body()?.let {
                     Result.success(response)
                 } ?: Result.failure(Exception("Generate art successful but response body is null"))
             } else {
                 val errorMessage = response.errorBody()?.string() ?: response.message()
-                Log.e("ImageUploadRepositoryImpl", "generateArt failed: ${response.code()} - $errorMessage")
                 Result.failure(Exception("Failed to generate image: ${response.code()} - $errorMessage"))
             }
         } catch (e: Exception) {

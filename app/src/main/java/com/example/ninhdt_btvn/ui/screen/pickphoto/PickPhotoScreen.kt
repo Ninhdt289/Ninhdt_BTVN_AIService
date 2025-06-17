@@ -109,14 +109,6 @@ fun PickPhotoScreen(
                         .padding(paddingValues),
                     lazyGridState = lazyGridState
                 )
-                
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp)
-                    )
-                }
             }
         }
     }

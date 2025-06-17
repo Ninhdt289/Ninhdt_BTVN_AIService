@@ -22,7 +22,7 @@ fun ScreenNavigation(
         startDestination = AiGenScreen.MainScreen.route
     ) {
         mainScreen(
-            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
+            onOpenPickPhoto = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
             onImageGenerated = { imageUrl ->
                 val encodedUrl = URLEncoder.encode(imageUrl, StandardCharsets.UTF_8.toString())
                 navController.navigate("${AiGenScreen.ResultScreen.route}/$encodedUrl") {

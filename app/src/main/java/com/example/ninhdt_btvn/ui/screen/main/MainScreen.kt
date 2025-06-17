@@ -43,13 +43,13 @@ fun MainScreen(
     imageUri: String? = null,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
-    onGenerate: () -> Unit = {},
+    onOpenPickPhoto: () -> Unit = {},
     onImageSelected: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
-        onPermissionGranted = onGenerate,
+        onPermissionGranted = onOpenPickPhoto,
         onPermissionDenied = { }
     )
 
@@ -73,7 +73,7 @@ fun MainScreen(
             onChangeImage = {  
                 viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
                 if (PermissionUtils.hasImagePermissions(context)) {
-                    onGenerate()
+                    onOpenPickPhoto()
                 } else {
                     permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
                 }

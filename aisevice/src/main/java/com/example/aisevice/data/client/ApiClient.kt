@@ -1,6 +1,6 @@
 package com.example.aisevice.data.client
 
-import com.example.aisevice.data.remote.request.StyleAPI
+import com.example.aisevice.data.remote.request.AIServiceApi
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,11 +16,11 @@ object ApiClient : KoinComponent {
     private val okHttpClient: OkHttpClient by inject()
     private val retrofit by lazy { buildRetrofit(baseUrl = BASE_URL) }
     private val retrofitGen by lazy { buildRetrofit(baseUrl = BASE_URL_GEN) }
-    val styleApi: StyleAPI by lazy {
-        retrofit.create(StyleAPI::class.java)
+    val styleApi: AIServiceApi by lazy {
+        retrofit.create(AIServiceApi::class.java)
     }
-    val genApi: StyleAPI by lazy {
-        retrofitGen.create(StyleAPI::class.java)
+    val genApi: AIServiceApi by lazy {
+        retrofitGen.create(AIServiceApi::class.java)
     }
 
     private fun buildRetrofit(baseUrl: String ): Retrofit {

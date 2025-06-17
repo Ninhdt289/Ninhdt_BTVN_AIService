@@ -44,7 +44,7 @@ fun DeviceImageGallery(
                             onToggle = { onToggleImage(image.id) }
                         )
                     }
-                    
+
                     if (isLoading) {
                         item(span = { GridItemSpan(3) }) {
                             Box(
