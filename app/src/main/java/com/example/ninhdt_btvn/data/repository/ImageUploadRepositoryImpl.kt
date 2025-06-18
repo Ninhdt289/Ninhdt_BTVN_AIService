@@ -26,7 +26,7 @@ class ImageUploadRepositoryImpl(
     override suspend fun uploadImage(imageUri: Uri): Result<String> = withContext(Dispatchers.IO) {
         return@withContext try {
             val presignedUrlResponse = ApiClient.genApi.getPresignedUrl()
-
+            clearTempUploadedImages()
             val inputStream = context.contentResolver.openInputStream(imageUri)
             val originalBitmap = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
@@ -81,7 +81,14 @@ class ImageUploadRepositoryImpl(
         }
     }
 
-
+    private fun clearTempUploadedImages() {
+        val cacheDir = context.cacheDir
+        cacheDir?.listFiles()?.forEach { file ->
+            if (file.name.contains("upload_") && file.name.endsWith(".jpg")) {
+                file.delete()
+            }
+        }
+    }
     override suspend fun generateArt(request: AiArtRequest): Result<Response<AiArtResponse>> {
         return try {
            val response = ApiClient.genApi.generateAiArt(request)

@@ -67,7 +67,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                                 }
                                 BitmapFactory.decodeStream(inputStream, null, options)
                                 
-                                val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, 200, 200)
+                                val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, 100, 100)
                                 
                                 contentResolver.openInputStream(contentUri)?.use { newStream ->
                                     options.inJustDecodeBounds = false
@@ -101,6 +101,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
 
         return@withContext images
     }
+
 
     private fun calculateSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
         var sampleSize = 1
