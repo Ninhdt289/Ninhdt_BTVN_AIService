@@ -6,7 +6,4 @@ object Key {
 }
 internal object ServiceConst {
     const val NOT_GET_API_TOKEN = "not_get_api_token"
-    const val TIME_STAMP_NULL = "time_stamp_null"
-    const val SEGMENTATION_NULL = "segmentation_null"
-    const val TIME_OUT_DURATION = 60000L
 }

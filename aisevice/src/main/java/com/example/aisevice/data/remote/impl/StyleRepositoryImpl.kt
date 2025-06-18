@@ -1,6 +1,5 @@
 package com.example.aisevice.data.remote.impl
 
-import android.util.Log
 import com.example.aisevice.data.remote.model.BaseResponse
 import com.example.aisevice.data.remote.model.StyleResponse
 import com.example.aisevice.data.remote.repository.StyleRepository
