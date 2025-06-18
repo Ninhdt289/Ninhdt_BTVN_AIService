@@ -1,6 +1,8 @@
 package com.example.ninhdt_btvn.data.repository
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import com.example.aisevice.data.client.ApiClient
@@ -21,18 +23,41 @@ import retrofit2.Response
 class ImageUploadRepositoryImpl(
     private val context: Context
 ): ImageUploadRepository, KoinComponent {
-
-    private val aiServiceApi: AIServiceApi by inject()
-    override suspend fun uploadImage(imageUri: Uri): Result<String> =  withContext(Dispatchers.IO) {
-        Log.d("ImageUploadRepositoryImpl", "uploadImage: $imageUri")
+    override suspend fun uploadImage(imageUri: Uri): Result<String> = withContext(Dispatchers.IO) {
         return@withContext try {
             val presignedUrlResponse = ApiClient.genApi.getPresignedUrl()
-            Log.d("ImageUploadRepositoryImpl", "getPresignedUrl response: $presignedUrlResponse")
 
             val inputStream = context.contentResolver.openInputStream(imageUri)
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+
+            if (originalBitmap == null) {
+                return@withContext Result.failure(Exception("Failed to decode image"))
+            }
+
+            val maxDimension = 1024
+            val (width, height) = originalBitmap.width to originalBitmap.height
+            val scale = if (width > maxDimension || height > maxDimension) {
+                val scaleFactor = maxDimension.toFloat() / maxOf(width, height).toFloat()
+                scaleFactor
+            } else {
+                1f
+            }
+
+            val resizedBitmap = if (scale < 1f) {
+                Bitmap.createScaledBitmap(
+                    originalBitmap,
+                    (width * scale).toInt(),
+                    (height * scale).toInt(),
+                    true
+                )
+            } else {
+                originalBitmap
+            }
+
             val tempFile = File.createTempFile("upload_", ".jpg", context.cacheDir)
             FileOutputStream(tempFile).use { outputStream ->
-                inputStream?.copyTo(outputStream)
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             }
 
             val requestBody = tempFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
@@ -46,7 +71,6 @@ class ImageUploadRepositoryImpl(
             if (response.isSuccessful) {
                 Log.d("ImageUploadRepositoryImpl", "uploadImage success, path: ${presignedUrlResponse.data.path}")
                 Result.success(presignedUrlResponse.data.path)
-
             } else {
                 Log.e("ImageUploadRepositoryImpl", "uploadImage failed: ${response.code} - ${response.message}")
                 Result.failure(Exception("Failed to upload image: ${response.code}"))
@@ -57,9 +81,10 @@ class ImageUploadRepositoryImpl(
         }
     }
 
+
     override suspend fun generateArt(request: AiArtRequest): Result<Response<AiArtResponse>> {
         return try {
-           val response = aiServiceApi.generateAiArt(request)
+           val response = ApiClient.genApi.generateAiArt(request)
             if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(response)

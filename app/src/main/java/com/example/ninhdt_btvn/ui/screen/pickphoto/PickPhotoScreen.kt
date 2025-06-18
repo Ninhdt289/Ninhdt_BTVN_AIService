@@ -22,7 +22,6 @@ import org.koin.androidx.compose.koinViewModel
 import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 @Composable
 fun PickPhotoScreen(
