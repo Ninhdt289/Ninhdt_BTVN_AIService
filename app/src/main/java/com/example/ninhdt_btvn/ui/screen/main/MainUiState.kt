@@ -20,7 +20,7 @@ data class MainUIState(
 
     val isGenerating: Boolean = false,
 
-    val errorMessage: String? = "abc",
+    val errorMessage: String? = null,
 
     val showStyleSelector: Boolean = false,
 

@@ -39,6 +39,7 @@ import com.example.aisevice.data.remote.model.ThumbnailUrls
 import com.example.ninhdt_btvn.utils.PermissionUtils
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.text.style.TextOverflow
 import com.airbnb.lottie.compose.*
 import com.example.ninhdt_btvn.ui.screen.main.component.GenerateButton
 import com.example.ninhdt_btvn.ui.screen.main.component.LoadingDialog
@@ -112,6 +113,29 @@ fun MainScreen(
 
         if (state.isGenerating) {
             LoadingDialog(R.string.main_loading)
+        }
+
+        state.errorMessage?.let { errorMsg ->
+            LaunchedEffect(errorMsg) {
+                kotlinx.coroutines.delay(2000)
+                viewModel.onEvent(MainUIEvent.ClearError)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xFFD32F2F))
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = errorMsg,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
