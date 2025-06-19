@@ -31,7 +31,7 @@ fun LoadingDialog(
     titleResource: Int,
 ) {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.vsl_aiart_lottie_loading)
+        LottieCompositionSpec.RawRes(R.raw.vsl_aiart_lottie_loading2)
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,

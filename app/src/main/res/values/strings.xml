@@ -7,4 +7,5 @@
     <string name="result_loading">Downloading...</string>
     <string name="main_edittext_hint">Enter your prompt...</string>
     <string name="main_style_title">Choose your Style</string>
+    <string name="internet_connection_error">No internet conntection! Try again later</string>
 </resources>

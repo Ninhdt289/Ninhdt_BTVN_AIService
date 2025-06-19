@@ -27,7 +27,6 @@ class MainViewModel(
     private val pageSize = 100
 
     init {
-        getListStyle()
         loadImages()
     }
 
@@ -117,6 +116,10 @@ class MainViewModel(
 
             is MainUIEvent.ReloadStyles -> {
                 getListStyle()
+            }
+
+            is MainUIEvent.SetError ->  {
+                _uiState.update { it.copy(errorMessage = event.errorMessage) }
             }
         }
     }

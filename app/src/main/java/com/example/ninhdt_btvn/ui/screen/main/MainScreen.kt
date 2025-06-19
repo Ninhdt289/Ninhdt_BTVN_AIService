@@ -53,6 +53,15 @@ import com.example.ninhdt_btvn.ui.screen.main.component.StyleTabsWithContent
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
+
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}
 
 @Composable
 fun MainScreen(
@@ -68,9 +77,19 @@ fun MainScreen(
         onPermissionGranted = onOpenPickPhoto,
         onPermissionDenied = { }
     )
+    val errorMessage = stringResource(R.string.internet_connection_error)
+    var hasLoadedStyle by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!hasLoadedStyle && isNetworkAvailable(context)) {
+            viewModel.onEvent(MainUIEvent.ReloadStyles)
+            hasLoadedStyle = true
+        } else {
+            viewModel.onEvent(MainUIEvent.SetError(errorMessage))
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         OnNetworkAvailable {
-            if (state.availableStyles.isNullOrEmpty()) {
+            if (state.availableStyles.isNullOrEmpty() && isNetworkAvailable(context)) {
                 viewModel.onEvent(MainUIEvent.ReloadStyles)
             }
         }
@@ -133,14 +152,16 @@ fun MainScreen(
                     .align(Alignment.BottomCenter)
                     .background(Color(0xFFD32F2F))
                     .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = errorMsg,
                     color = Color.White,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(horizontal = 10.dp)
                 )
             }
         }

@@ -63,12 +63,19 @@ fun StyleItemCard(
                 .clip(RoundedCornerShape(8.dp))
                 .border(
                     width = if (isSelected) 2.dp else 0.dp,
-                    color = colorResource(id = R.color.primary_color),
+                    color = colorResource(id = R.color.style_selected_bg),
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable { onSelect(styleItem) }
         ) {
             UrlImageWithCoil(styleItem.key)
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(colorResource(R.color.style_selected_background))
+                )
+            }
         }
 
         Text(

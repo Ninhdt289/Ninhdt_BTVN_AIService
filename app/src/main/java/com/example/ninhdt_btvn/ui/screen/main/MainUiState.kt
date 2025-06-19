@@ -40,4 +40,5 @@ sealed class MainUIEvent {
     ) : MainUIEvent()
     data object ClearGeneratedImage : MainUIEvent()
     data object ReloadStyles : MainUIEvent()
+    data class SetError(val errorMessage: String) : MainUIEvent()
 }
