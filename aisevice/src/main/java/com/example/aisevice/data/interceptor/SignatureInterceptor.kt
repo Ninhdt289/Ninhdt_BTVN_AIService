@@ -10,7 +10,7 @@ internal class SignatureInterceptor : Interceptor {
         val signatureData = SignatureParser.parseData(
             Key.API_KEY,
             Key.PUBLIC_KEY,
-            TimeStampManage.timeStamp
+            System.currentTimeMillis()
         )
         val tokenIntegrity = signatureData.tokenIntegrity.ifEmpty { ServiceConst.NOT_GET_API_TOKEN}
 
