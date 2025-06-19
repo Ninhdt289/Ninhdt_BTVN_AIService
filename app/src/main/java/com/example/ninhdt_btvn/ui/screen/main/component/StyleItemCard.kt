@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.main.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,8 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -58,7 +63,7 @@ fun StyleItemCard(
                 .clip(RoundedCornerShape(8.dp))
                 .border(
                     width = if (isSelected) 2.dp else 0.dp,
-                    color = Color(0xFFE400D9),
+                    color = colorResource(id = R.color.primary_color),
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable { onSelect(styleItem) }
@@ -69,7 +74,7 @@ fun StyleItemCard(
         Text(
             text = styleItem.name,
             fontSize = 12.sp,
-            color = if (isSelected) Color(0xFFE400D9) else Color.Black
+            color = if (isSelected) colorResource(id = R.color.primary_color) else Color.Black
         )
     }
 }
@@ -106,7 +111,7 @@ fun StyleTabsWithContent(
         ScrollableTabRow(
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
-            contentColor = Color(0xFFE400D9),
+            contentColor = colorResource(id = R.color.primary_color),
             edgePadding = 2.dp,
             indicator = { tabPositions ->
                 val currentTab = tabPositions[selectedTabIndex]
@@ -117,7 +122,7 @@ fun StyleTabsWithContent(
                         .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
                         .width(16.dp)
                         .height(2.dp)
-                        .background(Color(0xFFE400D9), shape = CircleShape)
+                        .background(colorResource(id = R.color.primary_color), shape = CircleShape)
                 )
             },
             divider = {}
@@ -132,7 +137,7 @@ fun StyleTabsWithContent(
                             text = category.name,
                             fontSize = 14.sp,
                             fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
-                            color = if (selectedTabIndex == index) Color(0xFFE400D9) else Color.Gray,
+                            color = if (selectedTabIndex == index) colorResource(id = R.color.primary_color) else Color.Gray,
                             maxLines = 1,
                         )
                     }
@@ -156,12 +161,10 @@ fun StyleSelectionSection(
     selectedStyle: StyleItem?,
     onStyleSelected: (StyleItem) -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column() {
         Text(
             text = stringResource(R.string.main_style_title),
-            color = Color(0xFFE400D9),
+            color = colorResource(R.color.primary_color),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -176,6 +179,89 @@ fun StyleSelectionSection(
 }
 
 @Composable
+fun StyleSelectionPlaceholder() {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    val tabNames = listOf("Tab 1", "Tab 2", "Tab 3")
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.main_style_title),
+            color = colorResource(id = R.color.primary_color),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        // Tab row kiểu chữ có gạch chân
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            tabNames.forEachIndexed { index, name ->
+                Column(
+                    modifier = Modifier
+                        .clickable { selectedTabIndex = index }
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = name,
+                        fontSize = 14.sp,
+                        fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
+                        color = if (selectedTabIndex == index) colorResource(id = R.color.primary_color) else Color.Gray,
+                        maxLines = 1,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .width(16.dp)
+                            .background(
+                                if (selectedTabIndex == index) colorResource(id = R.color.primary_color) else Color.Transparent,
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
+        }
+        // List style giả
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(5) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray.copy(alpha = 0.5f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_main_image),
+                            contentDescription = "Add photo",
+                            modifier = Modifier.size(40.dp),
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(12.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color.LightGray.copy(alpha = 0.5f))
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun UrlImageWithCoil(url: String) {
     AsyncImage(
         model = url,
@@ -185,4 +271,11 @@ fun UrlImageWithCoil(url: String) {
             .size(100.dp)
             .clip(RoundedCornerShape(8.dp))
     )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    StyleSelectionPlaceholder()
 }

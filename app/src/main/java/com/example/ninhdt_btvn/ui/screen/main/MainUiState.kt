@@ -31,7 +31,6 @@ data class MainUIState(
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
     data object ClearError : MainUIEvent()
-    data object NavigateToPickPhoto : MainUIEvent()
     data class SetSelectedImage(val image: String) : MainUIEvent()
     data class SelectStyle(val styleId: String) : MainUIEvent()
     data object ToggleStyleSelector : MainUIEvent()

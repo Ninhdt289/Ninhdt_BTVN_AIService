@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,8 +33,8 @@ fun GenerateButton(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        Color(0xFFE400D9),
-                        Color(0xFF1D00F5)
+                        colorResource(id = R.color.primary_color),
+                        colorResource(id = R.color.second_color)
                     )
                 ),
                 shape = RoundedCornerShape(12.dp)

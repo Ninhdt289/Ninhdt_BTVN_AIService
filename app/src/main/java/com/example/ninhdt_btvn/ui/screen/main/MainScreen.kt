@@ -46,6 +46,7 @@ import com.example.ninhdt_btvn.ui.screen.main.component.PhotoUploadArea
 import com.example.ninhdt_btvn.ui.screen.main.component.PromptInputField
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleItemCard
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleList
+import com.example.ninhdt_btvn.ui.screen.main.component.StyleSelectionPlaceholder
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleSelectionSection
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleTabsWithContent
 
@@ -64,11 +65,6 @@ fun MainScreen(
         onPermissionGranted = onOpenPickPhoto,
         onPermissionDenied = { }
     )
-
-    LaunchedEffect(Unit) {
-        Log.d("MainScreen", "LaunchedEffect triggered $imageUri")
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = modifier
@@ -83,8 +79,7 @@ fun MainScreen(
             )
 
             PhotoUploadArea(
-                onChangeImage = {  
-                    viewModel.onEvent(MainUIEvent.NavigateToPickPhoto)
+                onChangeImage = {
                     if (PermissionUtils.hasImagePermissions(context)) {
                         onOpenPickPhoto()
                     } else {
@@ -94,24 +89,21 @@ fun MainScreen(
                 selectedImage = imageUri
             )
 
-            when {
-                !state.availableStyles.isNullOrEmpty() -> {
-                    StyleSelectionSection(
-                        styleList = state.availableStyles,
-                        selectedStyle = state.selectedStyle,
-                        onStyleSelected = { style ->
-                            viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
-                        }
-                    )
-                }
-
+            if (!state.availableStyles.isNullOrEmpty()) {
+                StyleSelectionSection(
+                    styleList = state.availableStyles,
+                    selectedStyle = state.selectedStyle,
+                    onStyleSelected = { style ->
+                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
+                    }
+                )
+            } else {
+                StyleSelectionPlaceholder()
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-
             GenerateButton(
-                onClick = { Log.d("GenerateButton", "Button clicked")
-                    viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected),context)
+                onClick = {
+                    Log.d("GenerateButton", "Button clicked")
+                    viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected), context)
                 },
                 enabled = !state.isGenerating && state.selectedImage != null
             )
@@ -155,7 +147,7 @@ fun PhotoUploadAreaPreview() {
 @Composable
 fun StyleItemCardPreview() {
     StyleItemCard(
-        styleItem =  StyleItem(
+        styleItem = StyleItem(
             id = "1",
             project = "test_project",
             name = "Style 1",
@@ -428,74 +420,75 @@ fun StyleTabsWithContentPreview() {
                         versionCode = 1
                     )
                 ),
-        StyleItem(
-            id = "2",
-            project = "test_project",
-            name = "Style 2",
-            key = "https://example.com/image2.jpg",
-            config = Config(
-                mode = 2,
-                baseModel = "base_model_2",
-                style = "style_2",
-                positivePrompt = "sharp focus",
-                negativePrompt = "noise",
-                imageSize = "512x512",
-                fixOpenpose = true,
-                alpha = "0.6",
-                strength = "0.7",
-                guidanceScale = "8.0",
-                numInferenceSteps = "40"
-            ),
-            mode = "manual",
-            version = "v2",
-            metadata = emptyList(),
-            priority = 2.0,
-            thumbnailApp = listOf(
-                ThumbnailItem(
-                    thumbnail = "https://example.com/thumb2.jpg",
-                    thumbnailType = "preview",
-                    id = "thumb2"
+                StyleItem(
+                    id = "2",
+                    project = "test_project",
+                    name = "Style 2",
+                    key = "https://example.com/image2.jpg",
+                    config = Config(
+                        mode = 2,
+                        baseModel = "base_model_2",
+                        style = "style_2",
+                        positivePrompt = "sharp focus",
+                        negativePrompt = "noise",
+                        imageSize = "512x512",
+                        fixOpenpose = true,
+                        alpha = "0.6",
+                        strength = "0.7",
+                        guidanceScale = "8.0",
+                        numInferenceSteps = "40"
+                    ),
+                    mode = "manual",
+                    version = "v2",
+                    metadata = emptyList(),
+                    priority = 2.0,
+                    thumbnailApp = listOf(
+                        ThumbnailItem(
+                            thumbnail = "https://example.com/thumb2.jpg",
+                            thumbnailType = "preview",
+                            id = "thumb2"
+                        )
+                    ),
+                    categories = listOf("anime", "fantasy"),
+                    segmentId = "segment_2",
+                    subscriptionType = "premium",
+                    aiFamily = "ai_gen_2",
+                    styleType = "realistic",
+                    imageSize = "512x512",
+                    baseModel = "base_model_2",
+                    shouldCollectImage = true,
+                    versionCode = 2,
+                    createdAt = "2025-06-14T00:00:00Z",
+                    updatedAt = "2025-06-14T00:00:00Z",
+                    pricing = 1,
+                    thumbnail = ThumbnailUrls(
+                        before = "https://example.com/before2.jpg",
+                        after = "https://example.com/after2.jpg",
+                        key = "thumb_key2",
+                        previewStyle = "preview2",
+                        reminderAfter = "reminder_after_url",
+                        reminderBefore = "reminder_before_url",
+                        noti = "notification_url"
+                    ),
+                    domain = Domain(
+                        id = "domain2",
+                        displayName = "Premium Domain",
+                        name = "premium",
+                        thumbnail = "https://example.com/domain_thumb2.jpg",
+                        baseUrl = "https://premium.example.com",
+                        priority = 2.0,
+                        createdAt = "2025-01-03T00:00:00Z",
+                        updatedAt = "2025-01-04T00:00:00Z",
+                        versionCode = 2
+                    )
                 )
             ),
-            categories = listOf("anime", "fantasy"),
-            segmentId = "segment_2",
-            subscriptionType = "premium",
-            aiFamily = "ai_gen_2",
-            styleType = "realistic",
-            imageSize = "512x512",
-            baseModel = "base_model_2",
-            shouldCollectImage = true,
-            versionCode = 2,
-            createdAt = "2025-06-14T00:00:00Z",
-            updatedAt = "2025-06-14T00:00:00Z",
-            pricing = 1,
-            thumbnail = ThumbnailUrls(
-                before = "https://example.com/before2.jpg",
-                after = "https://example.com/after2.jpg",
-                key = "thumb_key2",
-                previewStyle = "preview2",
-                reminderAfter = "reminder_after_url",
-                reminderBefore = "reminder_before_url",
-                noti = "notification_url"
-            ),
-            domain = Domain(
-                id = "domain2",
-                displayName = "Premium Domain",
-                name = "premium",
-                thumbnail = "https://example.com/domain_thumb2.jpg",
-                baseUrl = "https://premium.example.com",
-                priority = 2.0,
-                createdAt = "2025-01-03T00:00:00Z",
-                updatedAt = "2025-01-04T00:00:00Z",
-                versionCode = 2
-            )
-        )
-    ),  id = "",
+            id = "",
             priority = 3.14,
             project = "",
             segment = "",
 
-    ),
+            ),
         com.example.aisevice.data.remote.model.StyleCategory(
             name = "Category 2",
             styles = listOf(
@@ -623,13 +616,14 @@ fun StyleTabsWithContentPreview() {
                         versionCode = 2
                     )
                 )
-            ),  id = "",
+            ),
+            id = "",
             priority = 3.14,
             project = "",
             segment = "",
 
             )
-        )
+    )
 
 
     StyleTabsWithContent(
@@ -708,77 +702,77 @@ fun StyleSelectionSectionPreview() {
                         versionCode = 1
                     )
                 ),
-        StyleItem(
-            id = "2",
-            project = "test_project",
-            name = "Style 2",
-            key = "https://example.com/image2.jpg",
-            config = Config(
-                mode = 2,
-                baseModel = "base_model_2",
-                style = "style_2",
-                positivePrompt = "sharp focus",
-                negativePrompt = "noise",
-                imageSize = "512x512",
-                fixOpenpose = true,
-                alpha = "0.6",
-                strength = "0.7",
-                guidanceScale = "8.0",
-                numInferenceSteps = "40"
-            ),
-            mode = "manual",
-            version = "v2",
-            metadata = emptyList(),
-            priority = 2.0,
-            thumbnailApp = listOf(
-                ThumbnailItem(
-                    thumbnail = "https://example.com/thumb2.jpg",
-                    thumbnailType = "preview",
-                    id = "thumb2"
+                StyleItem(
+                    id = "2",
+                    project = "test_project",
+                    name = "Style 2",
+                    key = "https://example.com/image2.jpg",
+                    config = Config(
+                        mode = 2,
+                        baseModel = "base_model_2",
+                        style = "style_2",
+                        positivePrompt = "sharp focus",
+                        negativePrompt = "noise",
+                        imageSize = "512x512",
+                        fixOpenpose = true,
+                        alpha = "0.6",
+                        strength = "0.7",
+                        guidanceScale = "8.0",
+                        numInferenceSteps = "40"
+                    ),
+                    mode = "manual",
+                    version = "v2",
+                    metadata = emptyList(),
+                    priority = 2.0,
+                    thumbnailApp = listOf(
+                        ThumbnailItem(
+                            thumbnail = "https://example.com/thumb2.jpg",
+                            thumbnailType = "preview",
+                            id = "thumb2"
+                        )
+                    ),
+                    categories = listOf("anime", "fantasy"),
+                    segmentId = "segment_2",
+                    subscriptionType = "premium",
+                    aiFamily = "ai_gen_2",
+                    styleType = "realistic",
+                    imageSize = "512x512",
+                    baseModel = "base_model_2",
+                    shouldCollectImage = true,
+                    versionCode = 2,
+                    createdAt = "2025-06-14T00:00:00Z",
+                    updatedAt = "2025-06-14T00:00:00Z",
+                    pricing = 1,
+                    thumbnail = ThumbnailUrls(
+                        before = "https://example.com/before2.jpg",
+                        after = "https://example.com/after2.jpg",
+                        key = "thumb_key2",
+                        previewStyle = "preview2",
+                        reminderAfter = "reminder_after_url",
+                        reminderBefore = "reminder_before_url",
+                        noti = "notification_url"
+                    ),
+                    domain = Domain(
+                        id = "domain2",
+                        displayName = "Premium Domain",
+                        name = "premium",
+                        thumbnail = "https://example.com/domain_thumb2.jpg",
+                        baseUrl = "https://premium.example.com",
+                        priority = 2.0,
+                        createdAt = "2025-01-03T00:00:00Z",
+                        updatedAt = "2025-01-04T00:00:00Z",
+                        versionCode = 2
+                    )
                 )
             ),
-            categories = listOf("anime", "fantasy"),
-            segmentId = "segment_2",
-            subscriptionType = "premium",
-            aiFamily = "ai_gen_2",
-            styleType = "realistic",
-            imageSize = "512x512",
-            baseModel = "base_model_2",
-            shouldCollectImage = true,
-            versionCode = 2,
-            createdAt = "2025-06-14T00:00:00Z",
-            updatedAt = "2025-06-14T00:00:00Z",
-            pricing = 1,
-            thumbnail = ThumbnailUrls(
-                before = "https://example.com/before2.jpg",
-                after = "https://example.com/after2.jpg",
-                key = "thumb_key2",
-                previewStyle = "preview2",
-                reminderAfter = "reminder_after_url",
-                reminderBefore = "reminder_before_url",
-                noti = "notification_url"
-            ),
-            domain = Domain(
-                id = "domain2",
-                displayName = "Premium Domain",
-                name = "premium",
-                thumbnail = "https://example.com/domain_thumb2.jpg",
-                baseUrl = "https://premium.example.com",
-                priority = 2.0,
-                createdAt = "2025-01-03T00:00:00Z",
-                updatedAt = "2025-01-04T00:00:00Z",
-                versionCode = 2
-            )
-        )
-    ),
 
-    id = "",
+            id = "",
             priority = 3.14,
             project = "",
             segment = "",
         )
     )
-    
+
     StyleSelectionSection(
         styleList = sampleCategories,
         selectedStyle = sampleCategories[0].styles[0],

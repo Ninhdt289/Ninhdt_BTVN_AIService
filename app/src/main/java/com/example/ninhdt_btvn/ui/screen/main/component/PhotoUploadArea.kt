@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,7 @@ fun PhotoUploadArea(
             .fillMaxHeight(0.5f)
             .border(
                 width = 2.dp,
-                color = Color(0xFFE400D9),
+                color = colorResource(id = R.color.primary_color),
                 shape = RoundedCornerShape(12.dp)
             )
             .background(
