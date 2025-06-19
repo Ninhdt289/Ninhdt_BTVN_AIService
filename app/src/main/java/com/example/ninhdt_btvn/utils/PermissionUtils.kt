@@ -45,7 +45,6 @@ object PermissionUtils {
             if (allGranted) {
                 onPermissionGranted()
             } else {
-                // Open settings if permission not granted
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
                 }

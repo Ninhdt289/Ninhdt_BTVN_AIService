@@ -1,9 +1,8 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto.component
 
-import com.example.ninhdt_btvn.data.local.model.DeviceImage
+import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,16 +17,12 @@ fun DeviceImageGallery(
     selectedImageId: Long?,
     onToggleImage: (Long) -> Unit,
     isLoading: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lazyGridState: LazyGridState = rememberLazyGridState()
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when {
-            isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            images.isEmpty() -> {
+            images.isEmpty() && !isLoading -> {
                 Text(
                     text = "Không tìm thấy ảnh nào trong thiết bị",
                     modifier = Modifier.align(Alignment.Center),
@@ -36,6 +31,7 @@ fun DeviceImageGallery(
             }
             else -> {
                 LazyVerticalGrid(
+                    state = lazyGridState,
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -47,6 +43,19 @@ fun DeviceImageGallery(
                             isSelected = image.id == selectedImageId,
                             onToggle = { onToggleImage(image.id) }
                         )
+                    }
+
+                    if (isLoading) {
+                        item(span = { GridItemSpan(3) }) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
                     }
                 }
             }

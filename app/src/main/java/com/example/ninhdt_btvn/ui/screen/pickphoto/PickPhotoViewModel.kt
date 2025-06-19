@@ -1,15 +1,15 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
-import com.example.ninhdt_btvn.data.local.repository.ImageRepository
+import com.example.aisevice.data.local.model.DeviceImage
+import com.example.ninhdt_btvn.ui.shared.SharedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-
+import com.example.aisevice.data.local.repository.ImageRepository
 
 class PickPhotoViewModel(
     private val imageRepository: ImageRepository
@@ -18,36 +18,77 @@ class PickPhotoViewModel(
     private val _uiState = MutableStateFlow(PickPhotoUiState())
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
 
-    fun loadImages() {
+    init {
+        _uiState.value = _uiState.value.copy(
+            images = SharedState.images,
+            hasPermission = SharedState.hasPermission,
+            currentPage = SharedState.currentPage,
+            totalImages = SharedState.totalImages,
+            hasMoreImages = SharedState.hasMoreImages
+        )
+
+        Log.d("PickPhotoViewModel", "init shared state: ${SharedState.hasMoreImages}")
+        Log.d("PickPhotoViewModel", "init shared totalImages: ${SharedState.totalImages}")
+        Log.d("PickPhotoViewModel", "init shared lastLoadedOffset: ${SharedState.lastLoadedOffset}")
+        Log.d("PickPhotoViewModel", "init shared lastLoadedLimit: ${SharedState.lastLoadedLimit}")
+    }
+
+    fun loadImages(loadMore: Boolean = false) {
+        if (_uiState.value.isLoading || (!loadMore && !_uiState.value.hasMoreImages)) return
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                val images = imageRepository.getDeviceImages()
+                val offset = if (loadMore) {
+                    SharedState.lastLoadedOffset
+                } else {
+                    0
+                }
+                
+                Log.d("PickPhotoViewModel", "Loading images with offset: $offset, limit: ${SharedState.lastLoadedLimit}")
+                val images = imageRepository.getDeviceImages(offset, SharedState.lastLoadedLimit)
+                val totalImages = imageRepository.getTotalImageCount()
+                
                 _uiState.value = _uiState.value.copy(
-                    images = images,
-                    isLoading = false
+                    images = if (loadMore) SharedState.images + images else images,
+                    isLoading = false,
+                    currentPage = offset / SharedState.lastLoadedLimit,
+                    totalImages = totalImages,
+                    hasMoreImages = (offset + images.size) < totalImages
                 )
+
+                SharedState.apply {
+                    this.images = _uiState.value.images
+                    this.isLoading = false
+                    this.currentPage = _uiState.value.currentPage
+                    this.totalImages = totalImages
+                    this.hasMoreImages = (offset + images.size) < totalImages
+                    this.lastLoadedOffset = offset + SharedState.lastLoadedLimit
+                }
+                
+                Log.d("PickPhotoViewModel", "Loaded ${images.size} images. New offset: ${SharedState.lastLoadedOffset}")
             } catch (e: Exception) {
+                Log.e("PickPhotoViewModel", "Error loading images", e)
                 _uiState.value = _uiState.value.copy(isLoading = false)
+                SharedState.isLoading = false
             }
         }
     }
 
     fun toggleImageSelection(imageId: Long) {
-        val currentSelected = _uiState.value.selectedImageId
+        val currentSelected = _uiState.value.selectedImage
+        val newSelected = _uiState.value.images.find { it.id == imageId }
         _uiState.value = _uiState.value.copy(
-            selectedImageId = if (currentSelected == imageId) null else imageId
+            selectedImage = if (currentSelected?.id == imageId) null else newSelected
         )
     }
 
     fun setPermissionGranted(granted: Boolean) {
+        SharedState.hasPermission = granted
         _uiState.value = _uiState.value.copy(hasPermission = granted)
-        if (granted) {
+        if (granted && SharedState.lastLoadedOffset == 0) {
             loadImages()
         }
     }
 
-    fun clearSelection() {
-        _uiState.value = _uiState.value.copy(selectedImageId = null)
-    }
 }
