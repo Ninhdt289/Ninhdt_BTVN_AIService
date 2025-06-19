@@ -50,7 +50,9 @@ import com.example.ninhdt_btvn.ui.screen.main.component.StyleList
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleSelectionPlaceholder
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleSelectionSection
 import com.example.ninhdt_btvn.ui.screen.main.component.StyleTabsWithContent
-
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 
 @Composable
 fun MainScreen(
@@ -67,6 +69,11 @@ fun MainScreen(
         onPermissionDenied = { }
     )
     Box(modifier = Modifier.fillMaxSize()) {
+        OnNetworkAvailable {
+            if (state.availableStyles.isNullOrEmpty()) {
+                viewModel.onEvent(MainUIEvent.ReloadStyles)
+            }
+        }
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -140,6 +147,28 @@ fun MainScreen(
     }
 }
 
+@Composable
+fun OnNetworkAvailable(
+    onAvailable: () -> Unit
+) {
+    val context = LocalContext.current
+    val connectivityManager = remember {
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+    val callback = rememberUpdatedState(onAvailable)
+
+    DisposableEffect(Unit) {
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                callback.value()
+            }
+        }
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        onDispose {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

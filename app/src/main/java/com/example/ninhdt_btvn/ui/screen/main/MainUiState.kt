@@ -39,4 +39,5 @@ sealed class MainUIEvent {
         val onImageGenerated: (String) -> Unit
     ) : MainUIEvent()
     data object ClearGeneratedImage : MainUIEvent()
+    data object ReloadStyles : MainUIEvent()
 }

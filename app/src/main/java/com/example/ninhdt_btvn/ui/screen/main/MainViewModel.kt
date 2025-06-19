@@ -114,6 +114,10 @@ class MainViewModel(
             MainUIEvent.ClearGeneratedImage -> {
                 _uiState.update { it.copy(generatedImage = null) }
             }
+
+            is MainUIEvent.ReloadStyles -> {
+                getListStyle()
+            }
         }
     }
 
