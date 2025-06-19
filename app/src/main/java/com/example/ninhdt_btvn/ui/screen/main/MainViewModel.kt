@@ -139,7 +139,8 @@ class MainViewModel(
         Log.d("GenerateImage", "Bắt đầu generateImage với uri: $uri")
         val selectedImage = uri
         val styleId = _uiState.value.selectedStyleId ?: _uiState.value.selectedStyle?.id
-        val prompt = _uiState.value.promptText
+        val prompt =_uiState.value.promptText.ifBlank {_uiState.value.selectedStyle?.config?.positivePrompt}
+
 
         if (selectedImage == null) {
             Log.d("GenerateImage", "Chưa chọn ảnh")
@@ -167,8 +168,7 @@ class MainViewModel(
                         file = uploadedPath,
                         styleId = styleId,
                         positivePrompt = prompt,
-                        negativePrompt = null,
-                        imageSize = null
+                        negativePrompt = _uiState.value.selectedStyle?.config?.negativePrompt,
                     )
 
                     imageUploadRepository.generateArt(request)

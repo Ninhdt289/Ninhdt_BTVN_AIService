@@ -1,7 +1,6 @@
 package com.example.ninhdt_btvn.data.repository
 
 import android.net.Uri
-import com.example.aisevice.data.remote.model.BaseResponse
 import com.example.aisevice.data.remote.request.AiArtRequest
 import com.example.aisevice.data.remote.request.AiArtResponse
 import retrofit2.Response
