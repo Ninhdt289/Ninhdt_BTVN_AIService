@@ -32,6 +32,9 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
         val selection = null
         val selectionArgs = null
 
+        val startTime = System.currentTimeMillis()
+        var skipBitmap = false
+
         try {
             contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -60,24 +63,34 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                             id
                         )
 
-                        val bitmap = try {
-                            contentResolver.openInputStream(contentUri)?.use { inputStream ->
-                                val options = BitmapFactory.Options().apply {
-                                    inJustDecodeBounds = true
+
+                        val bitmap = if (!skipBitmap) {
+                            try {
+                                Log.d("ImageRepository", "Loading bitmap for image $count")
+                                contentResolver.openInputStream(contentUri)?.use { inputStream ->
+                                    val options = BitmapFactory.Options().apply {
+                                        inJustDecodeBounds = true
+                                    }
+                                    BitmapFactory.decodeStream(inputStream, null, options)
+
+                                    val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, 100, 100)
+
+                                    contentResolver.openInputStream(contentUri)?.use { newStream ->
+                                        options.inJustDecodeBounds = false
+                                        options.inSampleSize = sampleSize
+                                        BitmapFactory.decodeStream(newStream, null, options)
+                                    }
                                 }
-                                BitmapFactory.decodeStream(inputStream, null, options)
-                                
-                                val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, 100, 100)
-                                
-                                contentResolver.openInputStream(contentUri)?.use { newStream ->
-                                    options.inJustDecodeBounds = false
-                                    options.inSampleSize = sampleSize
-                                    BitmapFactory.decodeStream(newStream, null, options)
-                                }
+                            } catch (e: Exception) {
+                                Log.e("ImageRepository", "Error loading bitmap for image $id", e)
+                                null
                             }
-                        } catch (e: Exception) {
-                            Log.e("ImageRepository", "Error loading bitmap for image $id", e)
+                        } else {
                             null
+                        }
+
+                        if (!skipBitmap && System.currentTimeMillis() - startTime > 1000) {
+                            skipBitmap = true
                         }
 
                         images.add(
