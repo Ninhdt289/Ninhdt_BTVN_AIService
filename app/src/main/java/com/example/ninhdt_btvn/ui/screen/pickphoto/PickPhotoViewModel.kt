@@ -26,11 +26,6 @@ class PickPhotoViewModel(
             totalImages = SharedState.totalImages,
             hasMoreImages = SharedState.hasMoreImages
         )
-
-        Log.d("PickPhotoViewModel", "init shared state: ${SharedState.hasMoreImages}")
-        Log.d("PickPhotoViewModel", "init shared totalImages: ${SharedState.totalImages}")
-        Log.d("PickPhotoViewModel", "init shared lastLoadedOffset: ${SharedState.lastLoadedOffset}")
-        Log.d("PickPhotoViewModel", "init shared lastLoadedLimit: ${SharedState.lastLoadedLimit}")
     }
 
     fun loadImages(loadMore: Boolean = false) {
@@ -45,10 +40,6 @@ class PickPhotoViewModel(
                     0
                 }
 
-                Log.d(
-                    "PickPhotoViewModel",
-                    "Loading images with offset: $offset, limit: ${SharedState.lastLoadedLimit}"
-                )
                 val images = imageRepository.getDeviceImages(offset, SharedState.lastLoadedLimit)
                 val totalImages = imageRepository.getTotalImageCount()
 
@@ -69,13 +60,9 @@ class PickPhotoViewModel(
                     this.currentPage = _uiState.value.currentPage
                     this.totalImages = totalImages
                     this.hasMoreImages = hasMore
-                    this.lastLoadedOffset = offset + SharedState.lastLoadedLimit
+                    this.lastLoadedOffset = offset + lastLoadedLimit
                 }
 
-                Log.d(
-                    "PickPhotoViewModel",
-                    "Loaded ${images.size} images. New offset: ${SharedState.lastLoadedOffset}"
-                )
                 if (!loadMore && hasMore && images.isNotEmpty()) {
                     kotlinx.coroutines.delay(150)
                     loadImages(loadMore = true)
