@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.CachePolicy
 import com.example.aisevice.data.local.model.DeviceImage
 import com.example.ninhdt_btvn.R
 
@@ -55,7 +56,11 @@ fun DeviceImageItem(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(image.uri)
                         .crossfade(true)
+                        .crossfade(300)
                         .size(200)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .placeholderMemoryCacheKey(image.id.toString())
                         .build(),
                     placeholder = painterResource(R.drawable.ic_photo),
                     error = painterResource(R.drawable.ic_photo),

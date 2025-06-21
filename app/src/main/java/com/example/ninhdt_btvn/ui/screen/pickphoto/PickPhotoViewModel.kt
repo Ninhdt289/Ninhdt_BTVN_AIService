@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import com.example.aisevice.data.local.repository.ImageRepository
 
 class PickPhotoViewModel(
@@ -19,6 +20,7 @@ class PickPhotoViewModel(
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
     private val pageSize = 50
     private var currentPage = 0
+    private var loadJob: kotlinx.coroutines.Job? = null
 
     init {
         _uiState.value = _uiState.value.copy(
@@ -27,8 +29,8 @@ class PickPhotoViewModel(
 
     fun loadImages(loadMore: Boolean = false) {
         if (_uiState.value.isLoading || (loadMore && !_uiState.value.hasMoreImages)) return
-
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 val offset = if (loadMore) _uiState.value.images.size else 0
@@ -38,7 +40,7 @@ class PickPhotoViewModel(
                 val newImages = currentImages + images
                 val totalKnownCount = imageRepository.getTotalImageCount()
                 val hasMore = newImages.size < totalKnownCount
-                
+
                 currentPage = newImages.size / pageSize
 
                 _uiState.value = _uiState.value.copy(

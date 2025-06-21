@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto.component
 
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
@@ -36,9 +37,13 @@ fun DeviceImageGallery(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    flingBehavior = rememberSnapFlingBehavior(lazyGridState = lazyGridState)
                 ) {
-                    items(images) { image ->
+                    items(
+                        items = images,
+                        key = { it.id }
+                    ) { image ->
                         DeviceImageItem(
                             image = image,
                             isSelected = image.id == selectedImageId,
