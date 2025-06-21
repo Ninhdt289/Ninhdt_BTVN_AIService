@@ -26,11 +26,8 @@ class MainViewModel(
 
     private val pageSize = 50
 
-   /* init {
-        loadImages()
-    }*/
 
-    private fun loadImages() {
+    fun loadImages() {
         if (SharedState.isLoading || (!SharedState.hasMoreImages)) return
 
         viewModelScope.launch {
