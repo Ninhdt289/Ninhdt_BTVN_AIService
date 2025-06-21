@@ -30,7 +30,7 @@ fun DeviceImageItem(
     image: DeviceImage,
     isSelected: Boolean,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
@@ -42,11 +42,13 @@ fun DeviceImageItem(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             if (image.bitmap != null) {
-                Image(
-                    bitmap = image.bitmap!!.asImageBitmap(),
-                    contentDescription = image.displayName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(image.bitmap)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             } else {
                 AsyncImage(
