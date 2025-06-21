@@ -28,6 +28,7 @@ data class MainUIState(
 
     val imageUrl: String? = null
 )
+
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
     data object ClearError : MainUIEvent()
@@ -38,6 +39,7 @@ sealed class MainUIEvent {
         val uri: String?,
         val onImageGenerated: (String) -> Unit
     ) : MainUIEvent()
+
     data object ClearGeneratedImage : MainUIEvent()
     data object ReloadStyles : MainUIEvent()
     data class SetError(val errorMessage: String) : MainUIEvent()

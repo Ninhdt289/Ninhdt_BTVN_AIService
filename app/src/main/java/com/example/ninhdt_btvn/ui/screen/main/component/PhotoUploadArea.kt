@@ -49,7 +49,8 @@ fun PhotoUploadArea(
             )
             .clickable {
                 Log.d("PhotoUploadArea", "Clicked to change image")
-                onChangeImage() },
+                onChangeImage()
+            },
         contentAlignment = Alignment.Center
     ) {
         if (selectedImage != null) {

@@ -39,7 +39,8 @@ class ResultViewModel(private val imageRepository: ImageRepository) : ViewModel(
 
         viewModelScope.launch {
             try {
-                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val timeStamp =
+                    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 val fileName = "IMG_AI_$timeStamp.jpg"
                 val uri = imageRepository.downloadImage(imageUrl, fileName)
 

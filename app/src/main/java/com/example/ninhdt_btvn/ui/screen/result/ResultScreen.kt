@@ -126,6 +126,7 @@ fun PhotoArea(
                     contentScale = ContentScale.Fit
                 )
             }
+
             else -> {
                 Image(
                     painter = painterResource(id = R.drawable.ic_main_image),

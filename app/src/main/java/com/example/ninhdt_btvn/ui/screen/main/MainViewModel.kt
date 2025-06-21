@@ -25,8 +25,6 @@ class MainViewModel(
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
     private val pageSize = 50
-
-
     fun loadImages() {
         if (SharedState.isLoading || (!SharedState.hasMoreImages)) return
 
@@ -115,7 +113,7 @@ class MainViewModel(
                 getListStyle()
             }
 
-            is MainUIEvent.SetError ->  {
+            is MainUIEvent.SetError -> {
                 _uiState.update { it.copy(errorMessage = event.errorMessage) }
             }
         }
@@ -136,7 +134,8 @@ class MainViewModel(
         Log.d("GenerateImage", "Bắt đầu generateImage với uri: $uri")
         val selectedImage = uri
         val styleId = _uiState.value.selectedStyleId ?: _uiState.value.selectedStyle?.id
-        val prompt =_uiState.value.promptText.ifBlank {_uiState.value.selectedStyle?.config?.positivePrompt}
+        val prompt =
+            _uiState.value.promptText.ifBlank { _uiState.value.selectedStyle?.config?.positivePrompt }
 
 
         if (selectedImage == null) {

@@ -9,7 +9,7 @@ object SharedState {
     var currentPage: Int = 0
     var totalImages: Int = 0
     var hasMoreImages: Boolean = true
-    
+
     var lastLoadedOffset: Int = 0
     var lastLoadedLimit: Int = 20
 } 

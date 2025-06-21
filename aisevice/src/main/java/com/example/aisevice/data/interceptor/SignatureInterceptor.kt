@@ -1,4 +1,5 @@
 package com.example.aisevice.data.interceptor
+
 import com.apero.signature.SignatureParser
 import com.example.aisevice.ultils.Key
 import com.example.aisevice.ultils.ServiceConst
@@ -12,7 +13,7 @@ internal class SignatureInterceptor : Interceptor {
             Key.PUBLIC_KEY,
             System.currentTimeMillis()
         )
-        val tokenIntegrity = signatureData.tokenIntegrity.ifEmpty { ServiceConst.NOT_GET_API_TOKEN}
+        val tokenIntegrity = signatureData.tokenIntegrity.ifEmpty { ServiceConst.NOT_GET_API_TOKEN }
 
         val headers = hashMapOf(
             "Accept" to "application/json",
@@ -22,8 +23,8 @@ internal class SignatureInterceptor : Interceptor {
             "x-api-timestamp" to signatureData.timeStamp.toString(),
             "x-api-keyid" to Key.API_KEY,
             "x-api-token" to tokenIntegrity,
-            "x-api-bundleId" to "for.techtrek",
-            "App-name" to "Tecktrek",
+            "x-api-bundleId" to Key.BUNDLE_ID,
+            "App-name" to Key.APP_NAME,
         )
         val requestBuilder = chain.request().newBuilder()
         for ((key, value) in headers) {

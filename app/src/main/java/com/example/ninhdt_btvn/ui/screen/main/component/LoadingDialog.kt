@@ -54,7 +54,7 @@ fun LoadingDialog(
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    modifier = Modifier.size(height =100.dp, width = 100.dp)
+                    modifier = Modifier.size(height = 100.dp, width = 100.dp)
                 )
                 Text(
                     text = stringResource(id = titleResource),

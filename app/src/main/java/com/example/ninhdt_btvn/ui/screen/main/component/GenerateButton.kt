@@ -26,7 +26,8 @@ fun GenerateButton(
 ) {
     Button(
         onClick = {
-            onClick()  },
+            onClick()
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)

@@ -29,6 +29,7 @@ fun DeviceImageGallery(
                     textAlign = TextAlign.Center
                 )
             }
+
             else -> {
                 LazyVerticalGrid(
                     state = lazyGridState,

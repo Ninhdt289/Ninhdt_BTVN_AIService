@@ -34,7 +34,7 @@ object ApiClient : KoinComponent {
         retrofitGen.create(AIServiceApi::class.java)
     }
 
-    private fun buildRetrofit(baseUrl: String ): Retrofit {
+    private fun buildRetrofit(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(httpClient)
@@ -44,7 +44,7 @@ object ApiClient : KoinComponent {
 
     private val gsonConfig = GsonBuilder().create()
 
-    fun createLoggingInterceptor() : HttpLoggingInterceptor {
+    fun createLoggingInterceptor(): HttpLoggingInterceptor {
         val logLevel = if (true) {
             HttpLoggingInterceptor.Level.BODY
         } else {

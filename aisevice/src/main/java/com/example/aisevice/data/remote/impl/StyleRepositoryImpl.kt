@@ -7,13 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class StyleRepositoryImpl : StyleRepository {
-    override suspend fun getStyles(): Result<BaseResponse<StyleResponse>> = withContext(Dispatchers.IO) {
-        try {
-            val response = com.example.aisevice.data.client.ApiClient.styleApi.getStyles()
-            Result.success(response)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun getStyles(): Result<BaseResponse<StyleResponse>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = com.example.aisevice.data.client.ApiClient.styleApi.getStyles()
+                Result.success(response)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
-    }
 
 }

@@ -282,50 +282,51 @@ fun StyleTabsWithContentPreview() {
                     config = Config(
                         positivePrompt = "good lighting",
                         negativePrompt = "blurry",
-                        )),
-
-                    StyleItem(
-                        id = "2",
-                        name = "Style 2",
-                        key = "https://example.com/image2.jpg",
-                        config = Config(
-                            positivePrompt = "sharp focus",
-                            negativePrompt = "noise",
-                            ),
                     )
                 ),
-                ),
-            StyleCategory(
-                name = "Category 2",
-                styles = listOf(
-                    StyleItem(
-                        id = "1",
-                        name = "Style 1",
-                        key = "https://example.com/image1.jpg",
-                        config = Config(
-                             positivePrompt = "good lighting",
-                            negativePrompt = "blurry",
-                            ),
+
+                StyleItem(
+                    id = "2",
+                    name = "Style 2",
+                    key = "https://example.com/image2.jpg",
+                    config = Config(
+                        positivePrompt = "sharp focus",
+                        negativePrompt = "noise",
+                    ),
+                )
+            ),
+        ),
+        StyleCategory(
+            name = "Category 2",
+            styles = listOf(
+                StyleItem(
+                    id = "1",
+                    name = "Style 1",
+                    key = "https://example.com/image1.jpg",
+                    config = Config(
+                        positivePrompt = "good lighting",
+                        negativePrompt = "blurry",
+                    ),
 
                     ),
-                    StyleItem(
-                        id = "2",
-                        name = "Style 2",
-                        key = "https://example.com/image2.jpg",
-                        config = Config(
+                StyleItem(
+                    id = "2",
+                    name = "Style 2",
+                    key = "https://example.com/image2.jpg",
+                    config = Config(
 
-                            positivePrompt = "sharp focus",
-                            negativePrompt = "noise",
+                        positivePrompt = "sharp focus",
+                        negativePrompt = "noise",
 
                         ),
 
                     )
-                ),
+            ),
 
-                )
-        )
-                StyleTabsWithContent (
-                styleList = sampleCategories,
+            )
+    )
+    StyleTabsWithContent(
+        styleList = sampleCategories,
         selectedStyle = sampleCategories[0].styles[0],
         onStyleSelected = {}
     )
@@ -347,7 +348,8 @@ fun StyleSelectionSectionPreview() {
                         positivePrompt = "good lighting",
                         negativePrompt = "blurry",
 
-                ),),
+                        ),
+                ),
                 StyleItem(
                     id = "2",
                     name = "Style 2",

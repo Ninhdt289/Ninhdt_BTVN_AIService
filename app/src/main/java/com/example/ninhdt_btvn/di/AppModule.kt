@@ -11,7 +11,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val appModule = module {
-    single { ImageUploadRepositoryImpl( androidContext()) } bind ImageUploadRepository::class
+    single { ImageUploadRepositoryImpl(androidContext()) } bind ImageUploadRepository::class
     viewModelOf(::MainViewModel)
     viewModelOf(::PickPhotoViewModel)
     viewModelOf(::ResultViewModel)

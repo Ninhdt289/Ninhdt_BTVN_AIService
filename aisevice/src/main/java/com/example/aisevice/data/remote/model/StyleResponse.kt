@@ -24,4 +24,5 @@ data class Config(
 )
 
 data class StyleResponse(
-    @SerializedName("items") val items:  List<StyleCategory>)
+    @SerializedName("items") val items: List<StyleCategory>
+)

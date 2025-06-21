@@ -27,7 +27,10 @@ object PermissionUtils {
 
     fun hasImagePermissions(context: Context): Boolean {
         return getRequiredPermissions().all { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -37,7 +40,7 @@ object PermissionUtils {
         onPermissionDenied: () -> Unit
     ): ActivityResultLauncher<Array<String>> {
         val context = LocalContext.current
-        
+
         return rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->

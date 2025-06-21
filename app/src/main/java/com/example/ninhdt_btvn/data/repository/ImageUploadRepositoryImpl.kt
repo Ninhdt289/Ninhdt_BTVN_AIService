@@ -22,7 +22,7 @@ import retrofit2.Response
 
 class ImageUploadRepositoryImpl(
     private val context: Context
-): ImageUploadRepository, KoinComponent {
+) : ImageUploadRepository, KoinComponent {
     override suspend fun uploadImage(imageUri: Uri): Result<String> = withContext(Dispatchers.IO) {
         return@withContext try {
             val presignedUrlResponse = ApiClient.genApi.getPresignedUrl()
@@ -86,9 +86,10 @@ class ImageUploadRepositoryImpl(
             }
         }
     }
+
     override suspend fun generateArt(request: AiArtRequest): Result<Response<AiArtResponse>> {
         return try {
-           val response = ApiClient.genApi.generateAiArt(request)
+            val response = ApiClient.genApi.generateAiArt(request)
             if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(response)

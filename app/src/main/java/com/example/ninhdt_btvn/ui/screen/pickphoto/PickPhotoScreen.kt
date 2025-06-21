@@ -146,7 +146,7 @@ fun DeviceImageGalleryPreview() {
             displayName = ""
         )
     )
-    
+
     DeviceImageGallery(
         images = sampleImages,
         selectedImageId = 1,

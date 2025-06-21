@@ -139,8 +139,7 @@ fun StyleTabsWithContent(
                     selected = selectedTabIndex == index,
                     onClick = { selectedTabIndex = index },
                     modifier = Modifier
-                        .height(22.dp)
-                    ,
+                        .height(22.dp),
                     text = {
                         Text(
                             text = category.name,
