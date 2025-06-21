@@ -10,8 +10,6 @@ import com.example.aisevice.data.local.model.DeviceImage
 data class MainUIState(
     val promptText: String = "",
 
-    val generatedImage: Bitmap? = null,
-
     val availableStyles: List<StyleCategory>? = null,
 
     val selectedStyle: StyleItem? = null,

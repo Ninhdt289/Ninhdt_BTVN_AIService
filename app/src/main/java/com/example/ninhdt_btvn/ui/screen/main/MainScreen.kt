@@ -131,7 +131,7 @@ fun MainScreen(
                     Log.d("GenerateButton", "Button clicked")
                     viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected), context)
                 },
-                enabled = !state.isGenerating && state.selectedImage != null
+                enabled = state.selectedStyle != null && imageUri != null
             )
             Spacer(modifier = Modifier.height(50.dp))
         }

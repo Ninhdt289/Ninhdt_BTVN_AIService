@@ -45,7 +45,7 @@ fun GenerateButton(
             disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
         ),
         shape = RoundedCornerShape(16.dp),
-        // enabled = enabled
+        enabled = enabled
     ) {
         Text(
             text = stringResource(R.string.main_button),
