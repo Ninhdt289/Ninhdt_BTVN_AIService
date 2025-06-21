@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -34,10 +35,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aisevice.data.local.impl.ImageRepositoryImpl
+import com.example.aisevice.data.remote.impl.StyleRepositoryImpl
 import com.example.aisevice.data.remote.model.Config
 import com.example.aisevice.data.remote.model.StyleCategory
 import com.example.aisevice.data.remote.model.StyleItem
 import com.example.ninhdt_btvn.R
+import com.example.ninhdt_btvn.data.repository.ImageUploadRepositoryImpl
 import com.example.ninhdt_btvn.ui.screen.main.component.GenerateButton
 import com.example.ninhdt_btvn.ui.screen.main.component.LoadingDialog
 import com.example.ninhdt_btvn.ui.screen.main.component.PhotoUploadArea
@@ -378,8 +382,13 @@ fun GenerateButtonPreview() {
     GenerateButton(onClick = {})
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    val styleRepo = StyleRepositoryImpl()
+    val ImageRepo = ImageRepositoryImpl(LocalContext.current.contentResolver)
+    val uploadRepositoryImpl = ImageUploadRepositoryImpl(LocalContext.current)
+    val viewModel = MainViewModel(styleRepo,uploadRepositoryImpl ,ImageRepo)
+    MainScreen(viewModel = viewModel)
 }

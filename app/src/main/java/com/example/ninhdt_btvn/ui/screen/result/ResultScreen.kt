@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.result
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.aisevice.data.local.impl.ImageRepositoryImpl
+import com.example.aisevice.data.local.repository.ImageRepository
 import com.example.ninhdt_btvn.R
 import com.example.ninhdt_btvn.ui.screen.main.component.LoadingDialog
 import org.koin.androidx.compose.koinViewModel
@@ -174,8 +178,12 @@ fun DownloadButton(
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun ResultScreenPreview() {
-    ResultScreen()
+    val repo = ImageRepositoryImpl(LocalContext.current.contentResolver)
+    ResultScreen(
+        viewModel = ResultViewModel(repo),
+    )
 }
