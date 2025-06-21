@@ -24,11 +24,11 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
-    private val pageSize = 100
+    private val pageSize = 50
 
-    init {
+   /* init {
         loadImages()
-    }
+    }*/
 
     private fun loadImages() {
         if (SharedState.isLoading || (!SharedState.hasMoreImages)) return

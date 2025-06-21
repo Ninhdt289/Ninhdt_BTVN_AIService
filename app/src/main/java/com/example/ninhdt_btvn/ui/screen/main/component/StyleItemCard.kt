@@ -138,7 +138,9 @@ fun StyleTabsWithContent(
                 Tab(
                     selected = selectedTabIndex == index,
                     onClick = { selectedTabIndex = index },
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    modifier = Modifier
+                        .height(22.dp)
+                    ,
                     text = {
                         Text(
                             text = category.name,
@@ -190,7 +192,6 @@ fun StyleSelectionPlaceholder() {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabNames = listOf("Tab 1", "Tab 2", "Tab 3")
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             text = stringResource(R.string.main_style_title),
@@ -198,18 +199,16 @@ fun StyleSelectionPlaceholder() {
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
-        // Tab row kiểu chữ có gạch chân
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             tabNames.forEachIndexed { index, name ->
                 Column(
                     modifier = Modifier
                         .clickable { selectedTabIndex = index }
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -219,7 +218,7 @@ fun StyleSelectionPlaceholder() {
                         color = if (selectedTabIndex == index) colorResource(id = R.color.primary_color) else Color.Gray,
                         maxLines = 1,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Box(
                         modifier = Modifier
                             .height(2.dp)
