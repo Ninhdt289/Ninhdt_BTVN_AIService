@@ -17,14 +17,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,9 +93,11 @@ fun StyleItemCard(
 fun StyleList(
     styles: List<StyleItem>,
     selectedStyle: StyleItem?,
-    onStyleSelected: (StyleItem) -> Unit
+    onStyleSelected: (StyleItem) -> Unit,
+    listState: LazyListState
 ) {
     LazyRow(
+        state = listState,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
@@ -106,6 +111,7 @@ fun StyleList(
     }
 }
 
+
 @Composable
 fun StyleTabsWithContent(
     styleList: List<StyleCategory>,
@@ -113,53 +119,62 @@ fun StyleTabsWithContent(
     onStyleSelected: (StyleItem) -> Unit
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
-
+    val listState = rememberLazyListState()
     Column {
         ScrollableTabRow(
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
             contentColor = colorResource(id = R.color.primary_color),
-            edgePadding = 2.dp,
-            indicator = { tabPositions ->
-                val currentTab = tabPositions[selectedTabIndex]
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.BottomStart)
-                        .offset(x = currentTab.left + (currentTab.width - 16.dp) / 2)
-                        .width(16.dp)
-                        .height(2.dp)
-                        .background(colorResource(id = R.color.primary_color), shape = CircleShape)
-                )
-            },
+            edgePadding = 0.dp,
+            indicator = {},
             divider = {}
         ) {
             styleList.forEachIndexed { index, category ->
-                Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
+                Box(
                     modifier = Modifier
-                        .height(22.dp),
-                    text = {
+                        .width(5.dp)
+                        .height(28.dp)
+                        .clickable { selectedTabIndex = index },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
                         Text(
                             text = category.name,
                             fontSize = 14.sp,
                             fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
                             color = if (selectedTabIndex == index) colorResource(id = R.color.primary_color) else Color.Gray,
-                            maxLines = 1,
+                            maxLines = 1
                         )
+                        if (selectedTabIndex == index) {
+                            Box(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .height(2.dp)
+                                    .background(colorResource(id = R.color.primary_color), shape = CircleShape)
+                            )
+                        }
                     }
-                )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+
+    }
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         StyleList(
             styles = styleList[selectedTabIndex].styles,
             selectedStyle = selectedStyle,
-            onStyleSelected = onStyleSelected
+            onStyleSelected = onStyleSelected,
+            listState = listState
         )
+    }
+
+    LaunchedEffect(selectedTabIndex) {
+        listState.animateScrollToItem(0)
     }
 }
 
