@@ -69,14 +69,11 @@ class ImageUploadRepositoryImpl(
             ).execute()
 
             if (response.isSuccessful) {
-                Log.d("ImageUploadRepositoryImpl", "uploadImage success, path: ${presignedUrlResponse.data.path}")
                 Result.success(presignedUrlResponse.data.path)
             } else {
-                Log.e("ImageUploadRepositoryImpl", "uploadImage failed: ${response.code} - ${response.message}")
                 Result.failure(Exception("Failed to upload image: ${response.code}"))
             }
         } catch (e: Exception) {
-            Log.e("ImageUploadRepositoryImpl", "uploadImage exception: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -101,7 +98,6 @@ class ImageUploadRepositoryImpl(
                 Result.failure(Exception("Failed to generate image: ${response.code()} - $errorMessage"))
             }
         } catch (e: Exception) {
-            Log.e("ImageUploadRepositoryImpl", "generateArt exception: ${e.message}", e)
             Result.failure(e)
         }
     }

@@ -16,11 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import com.example.aisevice.data.local.model.DeviceImage
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.ninhdt_btvn.R
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -84,7 +86,7 @@ fun PickPhotoScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Cần quyền truy cập để xem ảnh trong thiết bị",
+                    text = stringResource(R.string.pickphoto_permission),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -93,7 +95,7 @@ fun PickPhotoScreen(
                         permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
                     }
                 ) {
-                    Text("Cấp quyền")
+                    Text(text = stringResource(R.string.pickphoto_go_to_setting))
                 }
             }
         } else {

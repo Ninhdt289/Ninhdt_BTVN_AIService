@@ -8,4 +8,9 @@
     <string name="main_edittext_hint">Enter your prompt...</string>
     <string name="main_style_title">Choose your Style</string>
     <string name="internet_connection_error">No internet conntection! Try again later</string>
+    <string name="pickphoto_permission">No Permisstion</string>
+    <string name="pickphoto_go_to_setting">Go to setting</string>
+    <string name="pickphoto_no_image">No image</string>
+
+    
 </resources>
