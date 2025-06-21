@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.aisevice.data.remote.request.AiArtRequest
 import com.example.aisevice.data.local.repository.ImageRepository
+import com.example.aisevice.data.remote.model.StyleItem
 
 class MainViewModel(
     private val repository: StyleRepository,
@@ -88,26 +89,14 @@ class MainViewModel(
                 _uiState.update { it.copy(errorMessage = null) }
             }
 
-            is MainUIEvent.SetSelectedImage -> {
-                _uiState.update { it.copy(imageUrl = event.image) }
-            }
-
             is MainUIEvent.SelectStyle -> {
-                selectStyle(event.styleId)
-            }
-
-            MainUIEvent.ToggleStyleSelector -> {
-                _uiState.update { it.copy(showStyleSelector = !it.showStyleSelector) }
+                selectStyle(event.style)
             }
 
             is MainUIEvent.GenerateImage -> {
-                Log.d("GenerateImage", "Generating image with prompt: ${_uiState.value.promptText}")
-                generateImage(context!!, event.uri, event.onImageGenerated)
+                generateImage(event.uri, event.onImageGenerated)
             }
 
-            MainUIEvent.ClearGeneratedImage -> {
-                _uiState.update { it.copy(generatedImage = null) }
-            }
 
             is MainUIEvent.ReloadStyles -> {
                 getListStyle()
@@ -119,47 +108,35 @@ class MainViewModel(
         }
     }
 
-    private fun selectStyle(styleId: String) {
+    private fun selectStyle(style: StyleItem) {
         _uiState.update { state ->
-            val selectedStyle =
-                state.availableStyles?.flatMap { it.styles }?.find { it.id == styleId }
             state.copy(
-                selectedStyle = selectedStyle,
-                selectedStyleId = styleId
+                selectedStyle = style,
             )
         }
     }
 
-    private fun generateImage(context: Context, uri: String?, onImageGenerated: (String) -> Unit) {
-        Log.d("GenerateImage", "Bắt đầu generateImage với uri: $uri")
+    private fun generateImage(uri: String?, onImageGenerated: (String) -> Unit) {
         val selectedImage = uri
-        val styleId = _uiState.value.selectedStyleId ?: _uiState.value.selectedStyle?.id
+        val styleId = _uiState.value.selectedStyle?.id
         val prompt =
             _uiState.value.promptText.ifBlank { _uiState.value.selectedStyle?.config?.positivePrompt }
 
 
         if (selectedImage == null) {
-            Log.d("GenerateImage", "Chưa chọn ảnh")
             _uiState.update { it.copy(errorMessage = "Please select an image first") }
             return
         }
         if (styleId == null) {
-            Log.d("GenerateImage", "Chưa chọn style")
             _uiState.update { it.copy(errorMessage = "Please select a style first") }
             return
         }
 
         viewModelScope.launch {
-            Log.d("GenerateImage", "Bắt đầu upload ảnh lên cloud...")
             _uiState.update { it.copy(isGenerating = true, errorMessage = null) }
 
             imageUploadRepository.uploadImage(Uri.parse(selectedImage))
                 .onSuccess { uploadedPath ->
-                    Log.d(
-                        "GenerateImage",
-                        "Upload thành công. Path trên cloud: $uploadedPath. Bắt đầu gen AI art..."
-                    )
-
                     val request = AiArtRequest(
                         file = uploadedPath,
                         styleId = styleId,
@@ -169,10 +146,6 @@ class MainViewModel(
 
                     imageUploadRepository.generateArt(request)
                         .onSuccess { response ->
-                            Log.d(
-                                "GenerateImage",
-                                "Gen AI art thành công: ${response.body()?.data?.url}"
-                            )
                             val imageUrl = response.body()?.data?.url ?: ""
                             _uiState.update {
                                 it.copy(
@@ -184,7 +157,6 @@ class MainViewModel(
                             onImageGenerated(imageUrl)
                         }
                         .onFailure { error ->
-                            Log.d("GenerateImage", "Gen AI art thất bại: ${error.message}")
                             _uiState.update {
                                 it.copy(
                                     isGenerating = false,
@@ -194,7 +166,6 @@ class MainViewModel(
                         }
                 }
                 .onFailure { error ->
-                    Log.d("GenerateImage", "Upload ảnh thất bại: ${error.message}")
                     _uiState.update {
                         it.copy(
                             isGenerating = false,

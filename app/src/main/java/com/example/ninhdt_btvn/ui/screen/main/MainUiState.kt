@@ -16,13 +16,9 @@ data class MainUIState(
 
     val selectedStyle: StyleItem? = null,
 
-    val selectedStyleId: String? = null,
-
     val isGenerating: Boolean = false,
 
     val errorMessage: String? = null,
-
-    val showStyleSelector: Boolean = false,
 
     val selectedImage: DeviceImage? = null,
 
@@ -31,16 +27,13 @@ data class MainUIState(
 
 sealed class MainUIEvent {
     data class UpdatePromptText(val text: String) : MainUIEvent()
-    data object ClearError : MainUIEvent()
-    data class SetSelectedImage(val image: String) : MainUIEvent()
-    data class SelectStyle(val styleId: String) : MainUIEvent()
-    data object ToggleStyleSelector : MainUIEvent()
+    data class SetError(val errorMessage: String) : MainUIEvent()
+    data class SelectStyle(val style: StyleItem) : MainUIEvent()
     data class GenerateImage(
         val uri: String?,
         val onImageGenerated: (String) -> Unit
     ) : MainUIEvent()
-
-    data object ClearGeneratedImage : MainUIEvent()
     data object ReloadStyles : MainUIEvent()
-    data class SetError(val errorMessage: String) : MainUIEvent()
+    data object ClearError : MainUIEvent()
+
 }

@@ -120,7 +120,7 @@ fun MainScreen(
                     styleList = state.availableStyles,
                     selectedStyle = state.selectedStyle,
                     onStyleSelected = { style ->
-                        viewModel.onEvent(MainUIEvent.SelectStyle(style.id))
+                        viewModel.onEvent(MainUIEvent.SelectStyle(style))
                     }
                 )
             } else {
