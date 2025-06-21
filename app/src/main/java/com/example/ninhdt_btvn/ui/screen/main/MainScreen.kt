@@ -38,6 +38,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
     onGenerate: () -> Unit = {},
+    onOpenPickPhoto: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
@@ -62,7 +63,7 @@ fun MainScreen(
         )
 
         PhotoUploadArea(
-            onChangeImage = {},
+            onChangeImage = { onOpenPickPhoto()},
             selectedImage = imageUri
         )
 

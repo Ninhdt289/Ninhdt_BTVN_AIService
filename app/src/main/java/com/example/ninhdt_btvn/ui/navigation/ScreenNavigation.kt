@@ -26,7 +26,8 @@ fun ScreenNavigation(
             imageUri = navController.currentBackStackEntry
                 ?.savedStateHandle
                 ?.get<String>("selected_image_uri"),
-            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
+            onGenerate = { navController.navigate(AiGenScreen.PickPhotoScreen.route) },
+            onOpenPickPhoto = { navController.navigate(AiGenScreen.PickPhotoScreen.route) }
         )
 
         pickPhotoScreen(

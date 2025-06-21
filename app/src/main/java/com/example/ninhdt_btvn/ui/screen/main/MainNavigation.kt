@@ -13,6 +13,7 @@ fun NavController.navigateToMain(navOptions: NavOptions) = navigate(route = Main
 fun NavGraphBuilder.mainScreen(
     imageUri: String? = null,
     onGenerate: () -> Unit = {},
+    onOpenPickPhoto: () -> Unit = {},
 ) {
     composable(route = MainRoute.route) {
             backStackEntry ->
@@ -25,6 +26,9 @@ fun NavGraphBuilder.mainScreen(
             imageUri = selectedImageUri.value,
             onGenerate = {
                 onGenerate()
+            },
+            onOpenPickPhoto = {
+                onOpenPickPhoto()
             }
         )
     }

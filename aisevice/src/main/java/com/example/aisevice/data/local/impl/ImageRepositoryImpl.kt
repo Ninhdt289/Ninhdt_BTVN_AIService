@@ -2,6 +2,7 @@ package com.example.aisevice.data.local.impl
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.util.Log
 import com.example.aisevice.data.local.model.DeviceImage
@@ -11,7 +12,7 @@ import kotlinx.coroutines.withContext
 
 
 class ImageRepositoryImpl(private val contentResolver: ContentResolver) {
- suspend fun getDeviceImages(): List<DeviceImage> = withContext(Dispatchers.IO) {
+  fun getDeviceImages(): List<DeviceImage> {
 
         val images = mutableListOf<DeviceImage>()
 
@@ -33,6 +34,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) {
                 null,
                 sortOrder
             )?.use { cursor ->
+                Log.d("ImageRepository", "Found ${cursor.count} images")
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
                 val displayNameColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
@@ -52,6 +54,13 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) {
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         id
                     )
+                    val bitmap = try {
+                        val inputStream = contentResolver.openInputStream(contentUri)
+                        BitmapFactory.decodeStream(inputStream)
+                    } catch (e: Exception) {
+                        Log.e("ImageRepository", "Error decoding bitmap for $contentUri", e)
+                        null
+                    }
 
                     images.add(
                         DeviceImage(
@@ -69,7 +78,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) {
             Log.e("ImageRepository", "Error loading images", e)
         }
 
-        return@withContext images
+        return images
     }
 
 

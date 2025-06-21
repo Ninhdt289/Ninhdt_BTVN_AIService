@@ -19,17 +19,15 @@ class PickPhotoViewModel(
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
 
     fun loadImages() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            try {
-                val images = imageRepository.getDeviceImages()
-                _uiState.value = _uiState.value.copy(
-                    images = images,
-                    isLoading = false
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            }
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        try {
+            val images = imageRepository.getDeviceImages()
+            _uiState.value = _uiState.value.copy(
+                images = images,
+                isLoading = false
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(isLoading = false)
         }
     }
 
