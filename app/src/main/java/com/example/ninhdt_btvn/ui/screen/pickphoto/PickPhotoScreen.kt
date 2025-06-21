@@ -36,12 +36,10 @@ fun PickPhotoScreen(
     val uiState by viewModel.uiState.collectAsState()
     val lazyGridState = rememberLazyGridState()
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        viewModel.setPermissionGranted(allGranted)
-    }
+    val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
+        onPermissionGranted = {},
+        onPermissionDenied = { }
+    )
 
     LaunchedEffect(Unit) {
         val hasPermission = PermissionUtils.hasImagePermissions(context)
