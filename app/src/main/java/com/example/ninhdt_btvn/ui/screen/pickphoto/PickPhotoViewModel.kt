@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aisevice.data.local.model.DeviceImage
-import com.example.ninhdt_btvn.ui.shared.SharedState
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,60 +17,41 @@ class PickPhotoViewModel(
 
     private val _uiState = MutableStateFlow(PickPhotoUiState())
     val uiState: StateFlow<PickPhotoUiState> = _uiState.asStateFlow()
+    private val pageSize = 50
+    private var currentPage = 0
 
     init {
         _uiState.value = _uiState.value.copy(
-            images = SharedState.images,
-            hasPermission = SharedState.hasPermission,
-            currentPage = SharedState.currentPage,
-            totalImages = SharedState.totalImages,
-            hasMoreImages = SharedState.hasMoreImages
         )
     }
 
     fun loadImages(loadMore: Boolean = false) {
-        if (_uiState.value.isLoading || (!loadMore && !_uiState.value.hasMoreImages)) return
+        if (_uiState.value.isLoading || (loadMore && !_uiState.value.hasMoreImages)) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                val offset = if (loadMore) {
-                    SharedState.lastLoadedOffset
-                } else {
-                    0
-                }
+                val offset = if (loadMore) _uiState.value.images.size else 0
+                val images = imageRepository.getDeviceImages(offset, pageSize)
 
-                val images = imageRepository.getDeviceImages(offset, SharedState.lastLoadedLimit)
-                val totalImages = imageRepository.getTotalImageCount()
-
-                val newImages = if (loadMore) SharedState.images + images else images
-                val hasMore = (offset + images.size) < totalImages
+                val currentImages = if (loadMore) _uiState.value.images else emptyList()
+                val newImages = currentImages + images
+                val totalKnownCount = imageRepository.getTotalImageCount()
+                val hasMore = newImages.size < totalKnownCount
+                
+                currentPage = newImages.size / pageSize
 
                 _uiState.value = _uiState.value.copy(
                     images = newImages,
                     isLoading = false,
-                    currentPage = offset / SharedState.lastLoadedLimit,
-                    totalImages = totalImages,
-                    hasMoreImages = hasMore
+                    totalImages = totalKnownCount,
+                    hasMoreImages = hasMore,
+                    currentPage = currentPage
                 )
 
-                SharedState.apply {
-                    this.images = newImages
-                    this.isLoading = false
-                    this.currentPage = _uiState.value.currentPage
-                    this.totalImages = totalImages
-                    this.hasMoreImages = hasMore
-                    this.lastLoadedOffset = offset + lastLoadedLimit
-                }
-
-                if (!loadMore && hasMore && images.isNotEmpty()) {
-                    kotlinx.coroutines.delay(150)
-                    loadImages(loadMore = true)
-                }
             } catch (e: Exception) {
                 Log.e("PickPhotoViewModel", "Error loading images", e)
                 _uiState.value = _uiState.value.copy(isLoading = false)
-                SharedState.isLoading = false
             }
         }
     }
@@ -84,9 +65,8 @@ class PickPhotoViewModel(
     }
 
     fun setPermissionGranted(granted: Boolean) {
-        SharedState.hasPermission = granted
         _uiState.value = _uiState.value.copy(hasPermission = granted)
-        if (granted && SharedState.lastLoadedOffset == 0) {
+        if (granted && _uiState.value.images.isEmpty()) {
             loadImages()
         }
     }

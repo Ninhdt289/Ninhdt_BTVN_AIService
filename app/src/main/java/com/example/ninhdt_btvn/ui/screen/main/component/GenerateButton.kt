@@ -1,6 +1,8 @@
 package com.example.ninhdt_btvn.ui.screen.main.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,43 +36,54 @@ fun GenerateButton(
     var isClickable by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
-    Button(
-        onClick = {
-            if (isClickable) {
-                isClickable = false
-                onClick()
-                coroutineScope.launch {
-                    delay(1000)
-                    isClickable = true
-                }
+    Box(modifier = Modifier.fillMaxWidth()) {
 
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        colorResource(id = R.color.primary_color),
-                        colorResource(id = R.color.second_color)
-                    )
+        Button(
+            onClick = {
+                if (isClickable) {
+                    isClickable = false
+                    onClick()
+                    coroutineScope.launch {
+                        delay(1000)
+                        isClickable = true
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.primary_color),
+                            colorResource(id = R.color.second_color)
+                        )
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ),
-                shape = RoundedCornerShape(12.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
             ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
-        ),
-        shape = RoundedCornerShape(16.dp),
-        enabled = enabled
-    ) {
-        Text(
-            text = stringResource(R.string.main_button),
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
+            shape = RoundedCornerShape(16.dp),
+            enabled = enabled
+        ) {
+            Text(
+                text = stringResource(R.string.main_button),
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        if (enabled.not()) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.White.copy(alpha = 0.2f))
+                    .clickable(enabled = false) { }
+            )
+        }
+
     }
 }
 

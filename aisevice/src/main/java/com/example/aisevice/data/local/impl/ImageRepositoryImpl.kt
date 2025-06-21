@@ -3,21 +3,63 @@ package com.example.aisevice.data.local.impl
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.example.aisevice.data.local.model.DeviceImage
 import com.example.aisevice.data.local.repository.ImageRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URL
 
 class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageRepository {
+
+    private val cachedImages = mutableListOf<DeviceImage>()
+    private val mutex = Mutex()
+    private var isPreloading = false
+
     override suspend fun getDeviceImages(offset: Int, limit: Int): List<DeviceImage> =
+        mutex.withLock {
+            val requiredSize = offset + limit
+            if (cachedImages.size >= requiredSize) {
+                return@withLock cachedImages.subList(offset, requiredSize)
+            }
+
+            val currentSize = cachedImages.size
+            val newImagesToFetch = requiredSize - currentSize
+
+            if (newImagesToFetch > 0) {
+                val fetchedImages = queryDeviceImages(currentSize, newImagesToFetch)
+                cachedImages.addAll(fetchedImages)
+            }
+
+            return@withLock if (cachedImages.size >= requiredSize) {
+                cachedImages.subList(offset, requiredSize)
+            } else {
+                cachedImages.drop(offset)
+            }
+        }
+
+    suspend fun preloadInitialPages() {
+        if (isPreloading || cachedImages.isNotEmpty()) return
+
+        isPreloading = true
+        withContext(Dispatchers.IO) {
+            try {
+                getDeviceImages(0, 100)
+            } catch (e: Exception) {
+                Log.e("ImageRepository", "Error preloading images", e)
+            } finally {
+                isPreloading = false
+            }
+        }
+    }
+
+    private suspend fun queryDeviceImages(offset: Int, limit: Int): List<DeviceImage> =
         withContext(Dispatchers.IO) {
             val images = mutableListOf<DeviceImage>()
 
@@ -30,18 +72,13 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
             )
 
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-            val selection = null
-            val selectionArgs = null
-
-            val startTime = System.currentTimeMillis()
-            var skipBitmap = false
 
             try {
                 contentResolver.query(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     projection,
-                    selection,
-                    selectionArgs,
+                    null,
+                    null,
                     sortOrder
                 )?.use { cursor ->
                     val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
@@ -67,51 +104,6 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                                 id
                             )
 
-
-                            val bitmap = if (!skipBitmap) {
-                                try {
-                                    Log.d("ImageRepository", "Loading bitmap for image $count")
-                                    contentResolver.openInputStream(contentUri)
-                                        ?.use { inputStream ->
-                                            val options = BitmapFactory.Options().apply {
-                                                inJustDecodeBounds = true
-                                            }
-                                            BitmapFactory.decodeStream(inputStream, null, options)
-
-                                            val sampleSize = calculateSampleSize(
-                                                options.outWidth,
-                                                options.outHeight,
-                                                100,
-                                                100
-                                            )
-
-                                            contentResolver.openInputStream(contentUri)
-                                                ?.use { newStream ->
-                                                    options.inJustDecodeBounds = false
-                                                    options.inSampleSize = sampleSize
-                                                    BitmapFactory.decodeStream(
-                                                        newStream,
-                                                        null,
-                                                        options
-                                                    )
-                                                }
-                                        }
-                                } catch (e: Exception) {
-                                    Log.e(
-                                        "ImageRepository",
-                                        "Error loading bitmap for image $id",
-                                        e
-                                    )
-                                    null
-                                }
-                            } else {
-                                null
-                            }
-
-                            if (!skipBitmap && System.currentTimeMillis() - startTime > 1000) {
-                                skipBitmap = true
-                            }
-
                             images.add(
                                 DeviceImage(
                                     id = id,
@@ -120,7 +112,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                                     dateAdded = dateAdded,
                                     size = size,
                                     mimeType = mimeType,
-                                    bitmap = bitmap
+                                    bitmap = null
                                 )
                             )
                             count++
@@ -133,7 +125,6 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
 
             return@withContext images
         }
-
 
     private fun calculateSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
         var sampleSize = 1

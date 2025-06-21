@@ -2,12 +2,11 @@ package com.example.ninhdt_btvn.ui.screen.main
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aisevice.data.local.impl.ImageRepositoryImpl
 import com.example.aisevice.data.remote.repository.StyleRepository
 import com.example.ninhdt_btvn.data.repository.ImageUploadRepository
-import com.example.ninhdt_btvn.ui.shared.SharedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,31 +24,9 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
-    private val pageSize = 50
-    fun loadImages() {
-        if (SharedState.isLoading || (!SharedState.hasMoreImages)) return
-
+    fun startImagePreloading() {
         viewModelScope.launch {
-            SharedState.isLoading = true
-            try {
-                val currentPage = SharedState.currentPage
-                val offset = currentPage * pageSize
-
-                val images = imageRepository.getDeviceImages(offset, pageSize)
-                val totalImages = imageRepository.getTotalImageCount()
-
-                SharedState.apply {
-                    this.images = if (currentPage == 0) images else this.images + images
-                    this.isLoading = false
-                    this.currentPage = currentPage
-                    this.totalImages = totalImages
-                    this.hasMoreImages = (offset + images.size) < totalImages
-                    this.lastLoadedOffset = offset + pageSize
-                    this.lastLoadedLimit = pageSize
-                }
-            } catch (e: Exception) {
-                SharedState.isLoading = false
-            }
+            (imageRepository as? ImageRepositoryImpl)?.preloadInitialPages()
         }
     }
 
@@ -79,7 +56,7 @@ class MainViewModel(
         }
     }
 
-    fun onEvent(event: MainUIEvent, context: Context? = null) {
+    fun onEvent(event: MainUIEvent) {
         when (event) {
             is MainUIEvent.UpdatePromptText -> {
                 _uiState.update { it.copy(promptText = event.text) }

@@ -79,11 +79,10 @@ fun MainScreen(
     val errorMessage = stringResource(R.string.internet_connection_error)
     var hasLoadedStyle by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        val hasPermission = PermissionUtils.hasImagePermissions(context)
-        if (hasPermission) {
-            viewModel.loadImages()
+        if (PermissionUtils.hasImagePermissions(context)) {
+            viewModel.startImagePreloading()
         }
-
+        
         if (!hasLoadedStyle && isNetworkAvailable(context)) {
             viewModel.onEvent(MainUIEvent.ReloadStyles)
             hasLoadedStyle = true
@@ -134,7 +133,7 @@ fun MainScreen(
             GenerateButton(
                 onClick = {
                     Log.d("GenerateButton", "Button clicked")
-                    viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected), context)
+                    viewModel.onEvent(MainUIEvent.GenerateImage(imageUri, onImageSelected))
                 },
                 enabled = state.selectedStyle != null && imageUri != null
             )
@@ -389,6 +388,6 @@ fun MainScreenPreview() {
     val styleRepo = StyleRepositoryImpl()
     val ImageRepo = ImageRepositoryImpl(LocalContext.current.contentResolver)
     val uploadRepositoryImpl = ImageUploadRepositoryImpl(LocalContext.current)
-    val viewModel = MainViewModel(styleRepo,uploadRepositoryImpl ,ImageRepo)
+    val viewModel = MainViewModel(styleRepo,uploadRepositoryImpl,ImageRepo)
     MainScreen(viewModel = viewModel)
 }
