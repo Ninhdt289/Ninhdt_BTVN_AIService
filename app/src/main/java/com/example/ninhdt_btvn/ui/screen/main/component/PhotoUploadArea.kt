@@ -46,11 +46,7 @@ fun PhotoUploadArea(
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(12.dp)
-            )
-            .clickable {
-                Log.d("PhotoUploadArea", "Clicked to change image")
-                onChangeImage()
-            },
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (selectedImage != null) {
@@ -75,8 +71,11 @@ fun PhotoUploadArea(
             )
         } else {
             Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { onChangeImage() },
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_main_image),
