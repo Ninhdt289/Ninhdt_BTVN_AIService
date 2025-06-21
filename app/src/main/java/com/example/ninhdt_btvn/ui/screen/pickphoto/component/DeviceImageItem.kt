@@ -31,39 +31,30 @@ import com.example.ninhdt_btvn.R
 fun DeviceImageItem(
     image: DeviceImage,
     isSelected: Boolean,
-    onToggle: () -> Unit,
+    onToggle: (DeviceImage) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .aspectRatio(1f)
-            .clickable(onClick = onToggle),
+            .clickable(onClick = { onToggle(image) }),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            if (image.bitmap != null) {
-                Image(
-                    bitmap = image.bitmap!!.asImageBitmap(),
-                    contentDescription = image.displayName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(image.uri)
-                        .crossfade(true)
-                        .size(200)
-                        .build(),
-                    placeholder = painterResource(R.drawable.ic_photo),
-                    error = painterResource(R.drawable.ic_photo),
-                    contentDescription = image.displayName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(image.uri)
+                    .crossfade(true)
+                    .size(250)
+                    .build(),
+                placeholder = painterResource(R.drawable.ic_main_image),
+                error = painterResource(R.drawable.ic_main_image),
+                contentDescription = image.displayName,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
             if (isSelected) {
                 Box(

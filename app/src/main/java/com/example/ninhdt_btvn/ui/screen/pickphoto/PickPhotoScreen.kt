@@ -9,6 +9,7 @@ import com.example.ninhdt_btvn.utils.PermissionUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,10 +37,12 @@ fun PickPhotoScreen(
     val uiState by viewModel.uiState.collectAsState()
     val lazyGridState = rememberLazyGridState()
 
-    val permissionLauncher = PermissionUtils.rememberPermissionLauncher(
-        onPermissionGranted = {},
-        onPermissionDenied = { }
-    )
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        viewModel.setPermissionGranted(allGranted)
+    }
 
     LaunchedEffect(Unit) {
         val hasPermission = PermissionUtils.hasImagePermissions(context)
@@ -48,16 +51,6 @@ fun PickPhotoScreen(
         } else {
             permissionLauncher.launch(PermissionUtils.getRequiredPermissions())
         }
-    }
-
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .distinctUntilChanged()
-            .collect { lastIndex ->
-                if (lastIndex != null && lastIndex >= uiState.images.size - 5) {
-                    viewModel.loadImages(loadMore = true)
-                }
-            }
     }
 
     Scaffold(
@@ -99,10 +92,13 @@ fun PickPhotoScreen(
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
                 DeviceImageGallery(
-                    images = uiState.images,
+                    pagingDataFlow = viewModel.pagingData,
                     selectedImageId = uiState.selectedImage?.id,
-                    onToggleImage = viewModel::toggleImageSelection,
-                    isLoading = uiState.isLoading,
+                    onToggleImage = { image ->
+                        viewModel.updateSelectedImage(
+                            if (uiState.selectedImage?.id == image.id) null else image
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
@@ -145,12 +141,16 @@ fun DeviceImageGalleryPreview() {
         )
     )
 
+    val pagingDataFlow = kotlinx.coroutines.flow.flowOf(
+        androidx.paging.PagingData.from(sampleImages)
+    )
+
     DeviceImageGallery(
-        images = sampleImages,
+        pagingDataFlow = pagingDataFlow,
         selectedImageId = 1,
         onToggleImage = {},
-        isLoading = false,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        lazyGridState = LazyGridState()
     )
 }
 

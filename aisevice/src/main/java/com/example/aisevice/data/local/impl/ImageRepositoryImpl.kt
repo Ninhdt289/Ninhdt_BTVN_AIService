@@ -9,8 +9,6 @@ import android.util.Log
 import com.example.aisevice.data.local.model.DeviceImage
 import com.example.aisevice.data.local.repository.ImageRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
@@ -18,46 +16,10 @@ import java.net.URL
 
 class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageRepository {
 
-    private val cachedImages = mutableListOf<DeviceImage>()
-    private val mutex = Mutex()
-    private var isPreloading = false
-
     override suspend fun getDeviceImages(offset: Int, limit: Int): List<DeviceImage> =
-        mutex.withLock {
-            val requiredSize = offset + limit
-            if (cachedImages.size >= requiredSize) {
-                return@withLock cachedImages.subList(offset, requiredSize)
-            }
-
-            val currentSize = cachedImages.size
-            val newImagesToFetch = requiredSize - currentSize
-
-            if (newImagesToFetch > 0) {
-                val fetchedImages = queryDeviceImages(currentSize, newImagesToFetch)
-                cachedImages.addAll(fetchedImages)
-            }
-
-            return@withLock if (cachedImages.size >= requiredSize) {
-                cachedImages.subList(offset, requiredSize)
-            } else {
-                cachedImages.drop(offset)
-            }
-        }
-
-    suspend fun preloadInitialPages() {
-        if (isPreloading || cachedImages.isNotEmpty()) return
-
-        isPreloading = true
         withContext(Dispatchers.IO) {
-            try {
-                getDeviceImages(0, 100)
-            } catch (e: Exception) {
-                Log.e("ImageRepository", "Error preloading images", e)
-            } finally {
-                isPreloading = false
-            }
+            queryDeviceImages(offset, limit)
         }
-    }
 
     private suspend fun queryDeviceImages(offset: Int, limit: Int): List<DeviceImage> =
         withContext(Dispatchers.IO) {
@@ -103,7 +65,7 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
                                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                                 id
                             )
-
+                            
                             images.add(
                                 DeviceImage(
                                     id = id,
@@ -125,18 +87,6 @@ class ImageRepositoryImpl(private val contentResolver: ContentResolver) : ImageR
 
             return@withContext images
         }
-
-    private fun calculateSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
-        var sampleSize = 1
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight = height / 2
-            val halfWidth = width / 2
-            while ((halfHeight / sampleSize) >= reqHeight && (halfWidth / sampleSize) >= reqWidth) {
-                sampleSize *= 2
-            }
-        }
-        return sampleSize
-    }
 
     override suspend fun getTotalImageCount(): Int = withContext(Dispatchers.IO) {
         var count = 0

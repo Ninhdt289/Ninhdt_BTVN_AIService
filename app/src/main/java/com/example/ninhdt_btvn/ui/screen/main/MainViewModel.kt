@@ -24,12 +24,6 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUIState())
     val uiState: StateFlow<MainUIState> = _uiState.asStateFlow()
 
-    fun startImagePreloading() {
-        viewModelScope.launch {
-            (imageRepository as? ImageRepositoryImpl)?.preloadInitialPages()
-        }
-    }
-
     private fun getListStyle() {
         viewModelScope.launch {
             val result = repository.getStyles()

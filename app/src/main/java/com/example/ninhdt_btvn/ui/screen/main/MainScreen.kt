@@ -79,10 +79,6 @@ fun MainScreen(
     val errorMessage = stringResource(R.string.internet_connection_error)
     var hasLoadedStyle by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (PermissionUtils.hasImagePermissions(context)) {
-            viewModel.startImagePreloading()
-        }
-        
         if (!hasLoadedStyle && isNetworkAvailable(context)) {
             viewModel.onEvent(MainUIEvent.ReloadStyles)
             hasLoadedStyle = true
