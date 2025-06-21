@@ -44,29 +44,42 @@ class PickPhotoViewModel(
                 } else {
                     0
                 }
-                
-                Log.d("PickPhotoViewModel", "Loading images with offset: $offset, limit: ${SharedState.lastLoadedLimit}")
+
+                Log.d(
+                    "PickPhotoViewModel",
+                    "Loading images with offset: $offset, limit: ${SharedState.lastLoadedLimit}"
+                )
                 val images = imageRepository.getDeviceImages(offset, SharedState.lastLoadedLimit)
                 val totalImages = imageRepository.getTotalImageCount()
-                
+
+                val newImages = if (loadMore) SharedState.images + images else images
+                val hasMore = (offset + images.size) < totalImages
+
                 _uiState.value = _uiState.value.copy(
-                    images = if (loadMore) SharedState.images + images else images,
+                    images = newImages,
                     isLoading = false,
                     currentPage = offset / SharedState.lastLoadedLimit,
                     totalImages = totalImages,
-                    hasMoreImages = (offset + images.size) < totalImages
+                    hasMoreImages = hasMore
                 )
 
                 SharedState.apply {
-                    this.images = _uiState.value.images
+                    this.images = newImages
                     this.isLoading = false
                     this.currentPage = _uiState.value.currentPage
                     this.totalImages = totalImages
-                    this.hasMoreImages = (offset + images.size) < totalImages
+                    this.hasMoreImages = hasMore
                     this.lastLoadedOffset = offset + SharedState.lastLoadedLimit
                 }
-                
-                Log.d("PickPhotoViewModel", "Loaded ${images.size} images. New offset: ${SharedState.lastLoadedOffset}")
+
+                Log.d(
+                    "PickPhotoViewModel",
+                    "Loaded ${images.size} images. New offset: ${SharedState.lastLoadedOffset}"
+                )
+                if (!loadMore && hasMore && images.isNotEmpty()) {
+                    kotlinx.coroutines.delay(150)
+                    loadImages(loadMore = true)
+                }
             } catch (e: Exception) {
                 Log.e("PickPhotoViewModel", "Error loading images", e)
                 _uiState.value = _uiState.value.copy(isLoading = false)

@@ -1,5 +1,6 @@
 package com.example.ninhdt_btvn.ui.screen.pickphoto.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,20 +44,17 @@ fun DeviceImageItem(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             if (image.bitmap != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(image.bitmap)
-                        .build(),
-                    placeholder = painterResource(R.drawable.ic_photo),
-                    error = painterResource(R.drawable.ic_photo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                Image(
+                    bitmap = image.bitmap!!.asImageBitmap(),
+                    contentDescription = image.displayName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             } else {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(image.uri)
+                        .crossfade(true)
                         .size(200)
                         .build(),
                     placeholder = painterResource(R.drawable.ic_photo),
